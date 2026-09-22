@@ -213,7 +213,7 @@
                                             <a href="${e.archivoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar">
                                                 ⬇️ Descargar
                                             </a>
-                                        </if>
+                                        </c:if>
 
                                         <!-- ELIMINAR (SOLO SI TIENE SESIÓN ACTIVA) -->
                                         <c:if test="${not empty sessionScope.usuario and e.completado}">
