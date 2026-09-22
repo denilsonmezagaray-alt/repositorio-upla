@@ -340,29 +340,48 @@
     </footer>
 </div>
 
-<!-- SCRIPTS DE NAVEGACIÓN DE PESTAÑAS 100% ROBUSTO Y VISOR -->
 <script>
     function openTab(tabId) {
-        // Ocultar todas las secciones de pestañas
-        const panes = document.querySelectorAll(".tab-pane");
-        panes.forEach(pane => pane.style.display = "none");
+        if (!tabId) return;
+        
+        // Ocultar todos los paneles de pestañas
+        const panes = document.querySelectorAll('.tab-pane');
+        panes.forEach(function(pane) {
+            pane.style.display = 'none';
+        });
 
-        // Quitar la clase active de los botones
-        const buttons = document.querySelectorAll(".tab-link");
-        buttons.forEach(btn => btn.classList.remove("active"));
+        // Desactivar todos los botones
+        const buttons = document.querySelectorAll('.tab-link');
+        buttons.forEach(function(btn) {
+            btn.classList.remove('active');
+        });
 
-        // Mostrar la sección seleccionada
-        const selectedPane = document.getElementById(tabId);
-        if (selectedPane) {
-            selectedPane.style.display = "block";
+        // Mostrar la pestaña seleccionada
+        const targetPane = document.getElementById(tabId);
+        if (targetPane) {
+            targetPane.style.display = 'block';
         }
 
-        // Marcar el botón activo correspondiente
-        const activeBtn = document.querySelector(`.tab-link[data-tab="${tabId}"]`);
-        if (activeBtn) {
-            activeBtn.classList.add("active");
-        }
+        // Activar el botón correspondiente
+        buttons.forEach(function(btn) {
+            if (btn.getAttribute('data-tab') === tabId || btn.getAttribute('onclick')?.includes(tabId)) {
+                btn.classList.add('active');
+            }
+        });
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const tabButtons = document.querySelectorAll(".tab-link");
+        tabButtons.forEach(function(btn) {
+            btn.addEventListener("click", function(e) {
+                e.preventDefault();
+                const tabId = this.getAttribute("data-tab");
+                if (tabId) {
+                    openTab(tabId);
+                }
+            });
+        });
+    });
 
     // VISOR DE IMÁGENES Y DOCUMENTOS EN PANTALLA SIN DESCARGAR
     function openDocViewer(url, title) {
