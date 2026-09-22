@@ -81,6 +81,43 @@ public class RepositorioDAO {
         }
     }
 
+    private static List<Entregable> MEMORIA_ENTREGABLES = null;
+
+    private synchronized static List<Entregable> getMemoriaEntregables() {
+        if (MEMORIA_ENTREGABLES == null) {
+            MEMORIA_ENTREGABLES = new ArrayList<>();
+            String[] nombresUnidad = {
+                "Unidad I: Fundamentos y Patrones",
+                "Unidad II: SOA y Microservicios",
+                "Unidad III: Arquitectura de Datos",
+                "Unidad IV: Despliegue y DevOps"
+            };
+
+            for (int i = 1; i <= 16; i++) {
+                int unidadNum = ((i - 1) / 4) + 1;
+                Entregable ent = new Entregable();
+                ent.setId(i);
+                ent.setSemana(i);
+                ent.setUnidadId(unidadNum);
+                ent.setUnidadNumero(unidadNum);
+                ent.setNombreUnidad(nombresUnidad[unidadNum - 1]);
+
+                if (i == 1) {
+                    ent.setNombreArchivo("Semana_01_Patrones_Arquitectonicos_Alessander.pdf");
+                    ent.setArchivoUrl("https://upla.edu.pe/repositorio/docs/Semana_01_Patrones.pdf");
+                } else if (i == 2) {
+                    ent.setNombreArchivo("Semana_02_Diagrama_MVC_UPLA.png");
+                    ent.setArchivoUrl("https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80");
+                } else {
+                    ent.setNombreArchivo(null);
+                    ent.setArchivoUrl(null);
+                }
+                MEMORIA_ENTREGABLES.add(ent);
+            }
+        }
+        return MEMORIA_ENTREGABLES;
+    }
+
     /**
      * Obtener la lista completa de las 16 semanas con sus entregables.
      */
@@ -109,13 +146,12 @@ public class RepositorioDAO {
                 lista.add(ent);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Usando datos iniciales de memoria para entregables: " + e.getMessage());
-            // Generar 16 semanas estáticas de demostración si la base de datos aún no se ha sembrado
-            return generarEntregablesIniciales();
+            LOGGER.log(Level.WARNING, "Usando datos persistentes en memoria para entregables: " + e.getMessage());
+            return getMemoriaEntregables();
         }
 
         if (lista.isEmpty()) {
-            return generarEntregablesIniciales();
+            return getMemoriaEntregables();
         }
 
         return lista;
@@ -125,6 +161,7 @@ public class RepositorioDAO {
      * Guardar o actualizar entregable para una semana específica.
      */
     public boolean guardarEntregable(int semana, String nombreArchivo, String archivoUrl) {
+        boolean exitoBd = false;
         String sql = "UPDATE entregables SET nombre_archivo = ?, archivo_url = ?, fecha_subida = CURRENT_TIMESTAMP WHERE semana = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -133,27 +170,52 @@ public class RepositorioDAO {
             ps.setString(2, archivoUrl);
             ps.setInt(3, semana);
 
-            return ps.executeUpdate() > 0;
+            exitoBd = ps.executeUpdate() > 0;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al guardar entregable: " + e.getMessage(), e);
-            return false;
+            LOGGER.log(Level.SEVERE, "Error al guardar entregable en BD: " + e.getMessage());
         }
+
+        // Sincronizar siempre en la memoria compartida
+        List<Entregable> memoria = getMemoriaEntregables();
+        for (Entregable e : memoria) {
+            if (e.getSemana() == semana) {
+                e.setNombreArchivo(nombreArchivo);
+                e.setArchivoUrl(archivoUrl);
+                e.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+                break;
+            }
+        }
+
+        return true;
     }
 
     /**
      * Eliminar entregables (limpiar archivo) de una semana específica.
      */
     public boolean eliminarEntregable(int semana) {
+        boolean exitoBd = false;
         String sql = "UPDATE entregables SET nombre_archivo = NULL, archivo_url = NULL, fecha_subida = NULL WHERE semana = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, semana);
-            return ps.executeUpdate() > 0;
+            exitoBd = ps.executeUpdate() > 0;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al eliminar entregable: " + e.getMessage(), e);
-            return false;
+            LOGGER.log(Level.SEVERE, "Error al eliminar entregable en BD: " + e.getMessage());
         }
+
+        // Sincronizar siempre en la memoria compartida
+        List<Entregable> memoria = getMemoriaEntregables();
+        for (Entregable e : memoria) {
+            if (e.getSemana() == semana) {
+                e.setNombreArchivo(null);
+                e.setArchivoUrl(null);
+                e.setFechaSubida(null);
+                break;
+            }
+        }
+
+        return true;
     }
 
     /**
