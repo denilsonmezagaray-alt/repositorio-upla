@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page import="pe.edu.upla.repositorio.dao.RepositorioDAO" %>
 <!--
   =============================================================================
-  REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE
-  Estudiante / Autor: Alessander (Ingeniería de Sistemas - UPLA)
-  Vista Principal: index.jsp (JSTL + Chart.js + Supabase + Responsive UI)
+  REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE 2026-I
+  Estudiante / Autor: Alessander (Ingeniería de Sistemas y Computación)
+  Docente: Mg. Raúl Enrique Fernández Bejarano
+  Vista Principal: index.jsp (Cyberpunk Neon Academic Glassmorphism System)
   =============================================================================
 -->
 <!DOCTYPE html>
@@ -13,150 +15,282 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repositorio Universitario | UPLA - Arquitectura de Software</title>
-    <!-- Estilos Personalizados UPLA Anti-Slop -->
+    <title>Portafolio Académico Digital | Arquitectura de Software 2026-I - UPLA</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
-    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <div class="container">
-    <!-- ENCABEZADO Y BARRA DE NAVEGACIÓN -->
-    <header class="navbar">
-        <div class="brand-section">
-            <div class="brand-logo">UPLA</div>
-            <div class="brand-info">
-                <h1>Repositorio Universitario de Entregables</h1>
-                <p>Asignatura: Arquitectura de Software &bull; Autor: Alessander (Ing. de Sistemas)</p>
+    <!-- TOP BAR DE NAVEGACIÓN Y ESTADO DEL SISTEMA -->
+    <header class="top-bar">
+        <div class="top-brand">
+            <div class="upla-hexagon-logo">UPLA</div>
+            <div class="top-brand-text">
+                <h1>UNIVERSIDAD PERUANA LOS ANDES</h1>
+                <p>FACULTAD DE INGENIERÍA // EPISC &bull; ARQUITECTURA DE SOFTWARE 2026-I</p>
             </div>
         </div>
 
-        <div class="user-controls">
-            <!-- MODO EDICIÓN / PRIVADO: SI EXISTE SESIÓN INICIADA -->
-            <c:if test="${not empty sessionScope.usuario}">
-                <div class="user-profile">
-                    <img src="${sessionScope.usuario.fotoUrl}" alt="Foto Perfil" class="avatar">
-                    <div>
-                        <div class="user-name">${sessionScope.usuario.nombre}</div>
-                        <span class="user-badge">Administrador</span>
-                    </div>
-                </div>
-                <a href="${pageContext.request.contextPath}/auth?action=logout" class="btn btn-secondary btn-sm">Cerrar Sesión</a>
-            </c:if>
-
-            <!-- MODO VISITANTE / PÚBLICO: SI NO HAY SESIÓN -->
-            <c:if test="${empty sessionScope.usuario}">
-                <a href="${pageContext.request.contextPath}/auth" class="btn btn-primary">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
-                    Iniciar Sesión / Registro
-                </a>
-            </c:if>
+        <div class="system-status-pills">
+            <span class="status-tag status-cyan">
+                <span style="width: 8px; height: 8px; background: var(--neon-cyan); border-radius: 50%; display: inline-block;"></span>
+                ARCHIVOS EN BD: ${totalSubidos} / 16
+            </span>
+            <span class="status-tag status-cyan">PORT: 8080</span>
+            
+            <c:choose>
+                <c:when test="${not empty sessionScope.usuario}">
+                    <span class="status-tag status-pink">⚡ MODO EDICIÓN (ALUMNO)</span>
+                    <a href="${pageContext.request.contextPath}/auth?action=logout" class="btn btn-outline" style="padding: 0.35rem 0.8rem; font-size: 0.75rem;">Cerrar Sesión</a>
+                </c:when>
+                <c:otherwise>
+                    <span class="status-tag status-cyan">👁️ MODO AUDITOR (LECTURA)</span>
+                    <a href="${pageContext.request.contextPath}/auth" class="btn btn-pink" style="padding: 0.4rem 0.9rem; font-size: 0.775rem;">
+                        ⚡ ACCESO ALUMNO (MODIFICAR)
+                    </a>
+                </c:otherwise>
+            </c:choose>
         </div>
     </header>
 
-    <!-- ALERTAS Y MENSAJES DE ESTADO -->
+    <!-- ALERTAS Y MENSAJES -->
     <c:if test="${param.msg == 'login_success'}">
-        <div class="alert alert-success">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Bienvenido de nuevo, ${sessionScope.usuario.nombre}. Has iniciado sesión en Modo Edición.
+        <div style="background: rgba(0, 255, 157, 0.15); border: 1px solid var(--neon-mint); color: var(--neon-mint); padding: 1rem 1.25rem; border-radius: 14px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            ⚡ Bienvenido de nuevo, <strong>${sessionScope.usuario.nombre}</strong>. Has iniciado sesión con permisos de edición completa.
         </div>
     </c:if>
     <c:if test="${param.msg == 'upload_success'}">
-        <div class="alert alert-success">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            ¡Archivo subido correctamente a Supabase Storage para la Semana ${param.week}!
+        <div style="background: rgba(0, 242, 254, 0.15); border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 1rem 1.25rem; border-radius: 14px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            🚀 ¡Entregable cargado exitosamente a Supabase Storage para la <strong>Semana ${param.week}</strong>!
         </div>
     </c:if>
     <c:if test="${param.msg == 'delete_success'}">
-        <div class="alert alert-error">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-            Entregable de la Semana ${param.week} eliminado exitosamente.
+        <div style="background: rgba(255, 0, 127, 0.15); border: 1px solid var(--neon-pink); color: var(--neon-pink); padding: 1rem 1.25rem; border-radius: 14px; margin-bottom: 1.5rem; font-size: 0.9rem;">
+            🗑️ Entregable de la <strong>Semana ${param.week}</strong> eliminado exitosamente.
         </div>
     </c:if>
 
-    <!-- SECCIÓN SUPERIOR: GRÁFICO CHART.JS Y FORMULARIO O MÉTRICAS -->
-    <div class="grid-top">
-        <!-- 1. GRÁFICO DINÁMICO DE CHART.JS (AVANCE POR UNIDADES) -->
-        <div class="card">
-            <div class="card-title">
-                <span>Progreso por Unidades Académicas</span>
-                <span class="icon-badge">📊</span>
+    <!-- HEADER BANNER PRINCIPAL OFICIAL DEL CURSO -->
+    <section class="header-banner">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div class="banner-subhead">
+                    <span style="display: inline-block; width: 6px; height: 6px; background: var(--neon-cyan); border-radius: 50%;"></span>
+                    // PORTAFOLIO ACADÉMICO DIGITAL OFICIAL
+                </div>
+                <h1 class="banner-title">ARQUITECTURA DE SOFTWARE 2026–I</h1>
+                <p class="banner-desc">
+                    Evidencias de aprendizaje, requerimientos de calidad (ISO/IEC 25010), modelos de 4+1 vistas, diseño por capas, APIs RESTful en Jakarta EE / Java EE y persistencia relacional PostgreSQL con Supabase.
+                </p>
+                <div class="meta-tags-row">
+                    <span class="meta-pill">📇 Código: <strong>332181</strong></span>
+                    <span class="meta-pill">📜 Plan: <strong>2022</strong></span>
+                    <span class="meta-pill">⭐ Créditos: <strong>02</strong></span>
+                    <span class="meta-pill">⏱️ Horas: <strong>04 Prácticas</strong></span>
+                    <span class="meta-pill">📍 Modalidad: <strong>Presencial</strong></span>
+                    <span class="meta-pill">🎓 Facultad: <strong>Ingeniería // EPISC</strong></span>
+                </div>
             </div>
-            <div style="position: relative; height: 220px; width: 100%;">
-                <canvas id="unidadesChart"></canvas>
+
+            <!-- LOGO INSIGNIA UPLA EN HEADER -->
+            <div style="text-align: center; background: rgba(0, 0, 0, 0.4); padding: 1.2rem; border-radius: 18px; border: 1px solid var(--border-glow);">
+                <div class="upla-hexagon-logo" style="width: 64px; height: 64px; font-size: 1.35rem; margin: 0 auto 0.5rem auto;">UPLA</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--neon-cyan); font-weight: 700;">UPLA &bull; HUANCAYO</div>
             </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" style="width: ${porcentajeProgreso}%;"></div>
+        </div>
+    </section>
+
+    <!-- TARJETAS DE INFORMACIÓN: ALUMNO Y DOCENTE -->
+    <div class="info-cards-grid">
+        <!-- TARJETA ESTUDIANTE AUTOR -->
+        <div class="cyber-card">
+            <div class="card-header-user">
+                <img src="${not empty sessionScope.usuario ? sessionScope.usuario.fotoUrl : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'}" alt="Foto Perfil Estudiante" class="avatar-neon">
+                <div class="user-title-block">
+                    <p>// ESTUDIANTE AUTOR &bull; INGENIERÍA DE SISTEMAS</p>
+                    <h3>${not empty sessionScope.usuario ? sessionScope.usuario.nombre : 'Alessander'}</h3>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">UNIVERSIDAD PERUANA LOS ANDES &bull; HUANCAYO</div>
+                </div>
             </div>
-            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);">
-                <span>Avance General del Semestre</span>
-                <strong style="color: var(--upla-gold-400);">${porcentajeProgreso}% (${totalSubidos} de 16 Semanas)</strong>
+
+            <div class="grid-details-2col">
+                <div class="detail-item-box">
+                    <div class="detail-label">CARRERA PROFESIONAL</div>
+                    <div class="detail-value">Ingeniería de Sistemas y Computación</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">CORREO INSTITUCIONAL</div>
+                    <div class="detail-value" style="color: var(--neon-cyan);">s01269h@upla.edu.pe</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">SEMESTRE ACADÉMICO</div>
+                    <div class="detail-value">2026-I &bull; Plan de Estudios 2022</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">ROL EN EL SISTEMA</div>
+                    <div class="detail-value" style="color: var(--neon-pink);">
+                        ${not empty sessionScope.usuario ? 'Administrador / Edición' : 'Modo Auditoria Académica'}
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 2. FORMULARIO DE SUBIDA (MODO EDICIÓN) O PANEL INFORMATIVO (MODO VISITANTE) -->
+        <!-- TARJETA DOCENTE CÁTEDRA -->
+        <div class="cyber-card">
+            <div class="card-header-user">
+                <div style="width: 68px; height: 68px; border-radius: 50%; background: linear-gradient(135deg, #7928ca, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 2rem; border: 2px solid var(--neon-pink); box-shadow: 0 0 15px var(--neon-pink);">
+                    👨‍🏫
+                </div>
+                <div class="user-title-block">
+                    <p>// DIRECCIÓN DOCENTE &bull; CÁTEDRA DE ARQUITECTURA</p>
+                    <h3>Mg. Raúl Enrique Fernández Bejarano</h3>
+                    <div style="font-size: 0.8rem; color: var(--neon-pink); font-weight: 700;">DOCENTE TITULAR DE LA ASIGNATURA</div>
+                </div>
+            </div>
+
+            <div class="grid-details-2col">
+                <div class="detail-item-box">
+                    <div class="detail-label">CORREO OFICIAL CÁTEDRA</div>
+                    <div class="detail-value" style="color: var(--neon-cyan);">d.rfernandezb@ms.upla.edu.pe</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">CÓDIGO & CRÉDITOS</div>
+                    <div class="detail-value">332181 &bull; 02 Créditos</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">CARGA HORARIA SEMANAL</div>
+                    <div class="detail-value">04 Horas Prácticas</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">PERÍODO ACADÉMICO</div>
+                    <div class="detail-value">2026-I (06 Abr – 26 Jul 2026)</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">MODALIDAD & FACULTAD</div>
+                    <div class="detail-value">Presencial &bull; Pabellón EPISC</div>
+                </div>
+                <div class="detail-item-box">
+                    <div class="detail-label">ESPECIALIDAD DOCENTE</div>
+                    <div class="detail-value" style="color: var(--neon-mint);">Arquitectura Cloud & Microservicios</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1rem;">
+                <a href="mailto:d.rfernandezb@ms.upla.edu.pe" class="btn btn-outline" style="width: 100%; justify-content: center; font-size: 0.825rem;">
+                    ✉️ Enviar Consulta al Mg. Raúl Fernández
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN DE REACTORES DE CAPACIDADES (4 UNIDADES CURRICULARES) -->
+    <section class="reactors-section">
+        <div class="reactors-title-row">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.775rem; color: var(--neon-cyan); letter-spacing: 0.1em; text-transform: uppercase;">
+                // PROGRAMACIÓN DE CAPACIDADES
+            </div>
+            <h2>Reactores de Avance Curricular (4 Unidades Temáticas)</h2>
+        </div>
+
+        <div class="reactors-grid">
+            <c:forEach var="u" items="${unidades}">
+                <div class="reactor-card">
+                    <div>
+                        <span class="unit-tag-pink">UNIDAD ${u.numero} &bull; SEM ${((u.numero-1)*4)+1}-${u.numero*4}</span>
+                        <h4 class="reactor-name">${u.nombre}</h4>
+                        <p style="font-size: 0.775rem; color: var(--text-secondary); margin-bottom: 1rem;">${u.descripcion}</p>
+                    </div>
+
+                    <div>
+                        <div class="reactor-progress-bar">
+                            <div class="reactor-progress-fill" style="width: ${(u.semanasCompletadas / 4.0) * 100}%;"></div>
+                        </div>
+                        <div class="reactor-avance-text">
+                            <span>AVANCE: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
+                            <span>${u.semanasCompletadas} / 4 SEMANAS</span>
+                        </div>
+                    </div>
+                </div>
+            </c:forEach>
+        </div>
+    </section>
+
+    <!-- GRID INFERIOR: GRÁFICO CYBER CHART.JS & FORMULARIO SUBIDA -->
+    <div class="info-cards-grid">
+        <!-- GRÁFICO CHART.JS CON COLORES CYBER NEON -->
+        <div class="cyber-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.1rem; font-weight: 800;">Métricas de Avance Curricular</h3>
+                <span class="status-tag status-cyan">CHART.JS LIVE</span>
+            </div>
+            <div style="position: relative; height: 230px; width: 100%;">
+                <canvas id="unidadesChart"></canvas>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; font-size: 0.85rem;">
+                <span style="color: var(--text-secondary);">Progreso Total del Semestre:</span>
+                <strong style="color: var(--neon-cyan); font-family: 'JetBrains Mono', monospace; font-size: 1rem;">${porcentajeProgreso}% (${totalSubidos} de 16 Entregables)</strong>
+            </div>
+        </div>
+
+        <!-- FORMULARIO DE SUBIDA DE ENTREGABLES (SOLO MODO EDICIÓN) O PANEL DE AUDITORÍA -->
         <c:choose>
             <c:when test="${not empty sessionScope.usuario}">
-                <!-- MODO EDICIÓN: SUBIDA DE ARCHIVOS MULTIPART -->
-                <div class="card">
-                    <div class="card-title">
-                        <span>Gestor de Subida de Entregables</span>
-                        <span class="icon-badge">☁️</span>
+                <div class="cyber-card" style="border-color: var(--neon-pink);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.1rem; font-weight: 800; color: var(--neon-pink);">Gestor de Carga de Entregables</h3>
+                        <span class="status-tag status-pink">SUPABASE STORAGE</span>
                     </div>
+
                     <form action="${pageContext.request.contextPath}/upload" method="post" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label class="form-label">Seleccionar Semana del Semestre (1 al 16):</label>
+                            <label class="form-label">Seleccionar Semana del Sílabo (1 a 16):</label>
                             <select name="semana" class="form-control" required>
                                 <c:forEach var="item" items="${entregables}">
                                     <option value="${item.semana}">
-                                        Semana ${item.semana} (${item.nombreUnidad}) - ${item.completado ? 'Completado' : 'Pendiente'}
+                                        Semana ${item.semana}: ${RepositorioDAO.getTemaSemana(item.semana)} - [${item.completado ? 'Completado' : 'Pendiente'}]
                                     </option>
                                 </c:forEach>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Adjuntar Archivo o Documento (PDF, ZIP, Docx, Imagen):</label>
+                            <label class="form-label">Adjuntar Documento o Evidencia (PDF, ZIP, DOCX, PNG):</label>
                             <input type="file" name="archivo" class="form-control" required>
                         </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            Subir Entregable a Supabase Storage
+                        <button type="submit" class="btn btn-pink" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+                            ⚡ Cargar Entregable a Supabase Cloud
                         </button>
                     </form>
                 </div>
             </c:when>
-
             <c:otherwise>
-                <!-- MODO VISITANTE: RESUMEN INFORMATIVO -->
-                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="cyber-card" style="display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
-                        <div class="card-title">
-                            <span>Información General del Repositorio</span>
-                            <span class="icon-badge">🎓</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <h3 style="font-size: 1.1rem; font-weight: 800;">Panel de Lectura y Auditoría UPLA</h3>
+                            <span class="status-tag status-cyan">SOLO LECTURA</span>
                         </div>
-                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem;">
-                            Bienvenido al repositorio digital de la asignatura <strong>Arquitectura de Software</strong> en la <strong>Universidad Peruana Los Andes</strong>.
-                            Cualquier visitante puede revisar los archivos publicados y descargarlos.
+                        <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1.25rem;">
+                            Este portafolio digital contiene todas las evidencias de aprendizaje, informes arquitectónicos y diagramas de la asignatura <strong>Arquitectura de Software (2026-I)</strong>.
                         </p>
-                        <div class="stats-wrapper">
-                            <div class="stat-item">
-                                <div class="stat-value">4</div>
-                                <div class="stat-label">Unidades</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center;">
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.85rem; border-radius: 12px;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--neon-cyan);">4</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">UNIDADES</div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-value">16</div>
-                                <div class="stat-label">Semanas</div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.85rem; border-radius: 12px;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--neon-pink);">16</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">SEMANAS</div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-value">${totalSubidos}</div>
-                                <div class="stat-label">Archivos</div>
+                            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 0.85rem; border-radius: 12px;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--neon-mint);">${totalSubidos}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted);">EVIDENCIAS</div>
                             </div>
                         </div>
                     </div>
                     <div style="margin-top: 1.5rem;">
-                        <a href="${pageContext.request.contextPath}/auth" class="btn btn-secondary" style="width: 100%; justify-content: center;">
-                            Iniciar Sesión como Administrador (Alessander)
+                        <a href="${pageContext.request.contextPath}/auth" class="btn btn-cyan" style="width: 100%; justify-content: center;">
+                            🔐 Acceso Alumno para Modificar (Alessander)
                         </a>
                     </div>
                 </div>
@@ -164,22 +298,26 @@
         </c:choose>
     </div>
 
-    <!-- SECCIÓN INFERIOR: TABLA DE LAS 16 SEMANAS -->
-    <div class="card" style="padding: 0; overflow: hidden;">
+    <!-- TABLA DE LAS 16 SEMANAS DEL SÍLABO OFICIAL -->
+    <div class="table-card">
         <div style="padding: 1.5rem 1.5rem 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <h2 style="font-size: 1.15rem; font-weight: 700;">Detalle de las 16 Semanas Académicas</h2>
-            <span style="font-size: 0.825rem; color: var(--text-secondary);">
-                Modo Actual: <strong style="color: var(--upla-gold-400);">${not empty sessionScope.usuario ? 'EDICIÓN (Privado)' : 'VISITANTE (Público)'}</strong>
+            <div>
+                <h2 style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary);">Programación de las 16 Semanas Académicas</h2>
+                <p style="font-size: 0.8rem; color: var(--text-secondary);">Sílabo de la Asignatura Arquitectura de Software &bull; Modalidad Presencial UPLA</p>
+            </div>
+            <span class="status-tag status-cyan">
+                ${not empty sessionScope.usuario ? 'MODO ALUMNO (EDICIÓN ACTIVA)' : 'MODO AUDITOR (LECTURA PÚBLICA)'}
             </span>
         </div>
 
-        <div class="table-container" style="border: none; border-radius: 0;">
+        <div style="overflow-x: auto;">
             <table class="weeks-table">
                 <thead>
                     <tr>
-                        <th>Semana</th>
-                        <th>Unidad Académica</th>
-                        <th>Estado del Entregable</th>
+                        <th>Sem.</th>
+                        <th>Tema del Sílabo Oficial</th>
+                        <th>Unidad</th>
+                        <th>Estado</th>
                         <th>Archivo Adjunto</th>
                         <th style="text-align: right;">Acciones</th>
                     </tr>
@@ -188,56 +326,53 @@
                     <c:forEach var="e" items="${entregables}">
                         <tr>
                             <td>
-                                <span class="week-badge">Semana ${e.semana}</span>
+                                <span class="week-num-badge">Sem ${e.semana}</span>
                             </td>
                             <td>
-                                <strong style="color: var(--text-primary); font-size: 0.9rem;">${e.nombreUnidad}</strong>
+                                <strong style="color: var(--text-primary); font-size: 0.875rem;">
+                                    ${RepositorioDAO.getTemaSemana(e.semana)}
+                                </strong>
+                            </td>
+                            <td>
+                                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted);">
+                                    Unidad ${e.unidadNumero}
+                                </span>
                             </td>
                             <td>
                                 <c:choose>
                                     <c:when test="${e.completado}">
-                                        <span class="status-pill status-completed">
-                                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                            Entregado
-                                        </span>
+                                        <span class="status-pill-completed">✓ Completado</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="status-pill status-pending">
-                                            <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
-                                            Pendiente
-                                        </span>
+                                        <span class="status-pill-pending">⌛ Pendiente</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                             <td>
                                 <c:choose>
                                     <c:when test="${e.completado}">
-                                        <span style="font-size: 0.85rem; color: var(--text-secondary); word-break: break-all;">
+                                        <span style="font-size: 0.825rem; color: var(--neon-cyan); word-break: break-all;">
                                             📄 ${e.nombreArchivo}
                                         </span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span style="font-size: 0.85rem; color: var(--text-muted); italic;">Sin entregable subido</span>
+                                        <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Sin entregables</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                             <td style="text-align: right;">
-                                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                                    <!-- BOTÓN DESCARGAR (VISIBLE PARA TODOS) -->
+                                <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
                                     <c:if test="${e.completado}">
-                                        <a href="${e.archivoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar Archivo">
-                                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                            Descargar
+                                        <a href="${e.archivoUrl}" target="_blank" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.775rem;">
+                                            ⬇️ Descargar
                                         </a>
                                     </c:if>
-
-                                    <!-- BOTÓN ELIMINAR (SOLO MODO EDICIÓN / PRIVADO) -->
                                     <c:if test="${not empty sessionScope.usuario and e.completado}">
-                                        <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar el entregable de la Semana ${e.semana}?');">
+                                        <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Eliminar la evidencia de la Semana ${e.semana}?');">
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="semana" value="${e.semana}">
-                                            <button type="submit" class="btn btn-danger btn-sm">
-                                                Eliminar
+                                            <button type="submit" class="btn btn-danger-sm">
+                                                🗑️ Eliminar
                                             </button>
                                         </form>
                                     </c:if>
@@ -250,18 +385,18 @@
         </div>
     </div>
 
+    <!-- PIE DE PÁGINA -->
     <footer class="footer">
-        <p><strong>Universidad Peruana Los Andes (UPLA)</strong> &bull; Facultad de Ingeniería</p>
-        <p>Proyecto de Arquitectura de Software &bull; Desarrollado por <strong>Alessander</strong></p>
+        <p><strong>UNIVERSIDAD PERUANA LOS ANDES &bull; FACULTAD DE INGENIERÍA // EPISC</strong></p>
+        <p>Portafolio Académico Digital de Arquitectura de Software 2026-I &bull; Desarrollado por <strong>Alessander</strong></p>
     </footer>
 </div>
 
-<!-- INICIALIZACIÓN DINÁMICA DE CHART.JS -->
+<!-- GRÁFICO CHART.JS CON ESTILO CYBER NEON -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('unidadesChart').getContext('2d');
         
-        // Extraer datos desde JSTL enviado por IndexServlet
         const labels = [];
         const dataCompletadas = [];
         
@@ -278,19 +413,19 @@
                     label: 'Semanas Completadas (de 4)',
                     data: dataCompletadas,
                     backgroundColor: [
-                        'rgba(212, 175, 55, 0.85)',
-                        'rgba(52, 211, 153, 0.85)',
-                        'rgba(96, 165, 250, 0.85)',
-                        'rgba(248, 113, 113, 0.85)'
+                        'rgba(0, 242, 254, 0.85)',
+                        'rgba(0, 255, 157, 0.85)',
+                        'rgba(157, 0, 255, 0.85)',
+                        'rgba(255, 0, 127, 0.85)'
                     ],
                     borderColor: [
-                        '#d4af37',
-                        '#34d399',
-                        '#60a5fa',
-                        '#f87171'
+                        '#00f2fe',
+                        '#00ff9d',
+                        '#9d00ff',
+                        '#ff007f'
                     ],
-                    borderWidth: 1.5,
-                    borderRadius: 6
+                    borderWidth: 2,
+                    borderRadius: 8
                 }]
             },
             options: {
@@ -302,29 +437,24 @@
                         max: 4,
                         ticks: {
                             stepSize: 1,
-                            color: '#94a3b8'
+                            color: '#a0aec0',
+                            font: { family: 'JetBrains Mono' }
                         },
-                        grid: {
-                            color: 'rgba(255, 255, 255, 0.06)'
-                        }
+                        grid: { color: 'rgba(255, 255, 255, 0.06)' }
                     },
                     x: {
                         ticks: {
-                            color: '#94a3b8'
+                            color: '#a0aec0',
+                            font: { family: 'Plus Jakarta Sans', weight: '700' }
                         },
-                        grid: {
-                            display: false
-                        }
+                        grid: { display: false }
                     }
                 },
                 plugins: {
                     legend: {
                         labels: {
-                            color: '#f8fafc',
-                            font: {
-                                family: 'Plus Jakarta Sans',
-                                weight: '600'
-                            }
+                            color: '#ffffff',
+                            font: { family: 'Plus Jakarta Sans', weight: '700' }
                         }
                     }
                 }
