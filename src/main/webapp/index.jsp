@@ -7,7 +7,7 @@
   REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE 2026-I
   Estudiante / Autor: Alessander Meza Garay (Código: r03396b)
   Docente: Mg. Raúl Enrique Fernández Bejarano
-  Vista Principal: index.jsp (Diseño Institucional Limpio y Pestañas Simplificadas)
+  Vista Principal: index.jsp (Múltiples Trabajos por Semana & Visor de Archivos)
   =============================================================================
 -->
 <!DOCTYPE html>
@@ -15,7 +15,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Académico Digital | Arquitectura de Software - UPLA</title>
+    <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -28,7 +28,7 @@
             <img src="${pageContext.request.contextPath}/img/upla_logo.png" alt="Logo UPLA" class="brand-logo-img">
             <div class="brand-info">
                 <h1>Universidad Peruana Los Andes</h1>
-                <p>Facultad de Ingeniería &bull; Asignatura: Arquitectura de Software 2026-I</p>
+                <p>Facultad de Ingeniería &bull; Arquitectura de Software 2026-I</p>
             </div>
         </div>
 
@@ -36,14 +36,14 @@
             <c:choose>
                 <c:when test="${not empty sessionScope.usuario}">
                     <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.3rem 0.8rem; background: rgba(0,82,204,0.15); border: 1px solid var(--upla-blue-600); border-radius: 9999px;">
-                        <img src="${pageContext.request.contextPath}/${sessionScope.usuario.fotoUrl}" alt="Alessander" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                        <img src="${pageContext.request.contextPath}/img/alessander.jpg" alt="Alessander" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
                         <span style="font-size: 0.825rem; font-weight: 700; color: #fff;">${sessionScope.usuario.nombre}</span>
                     </div>
                     <a href="${pageContext.request.contextPath}/auth?action=logout" class="btn btn-secondary btn-sm">Cerrar Sesión</a>
                 </c:when>
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/auth" class="btn btn-primary btn-sm">
-                        🔐 Acceso Administrador (Alessander)
+                        🔐 Acceso Alumno (Alessander)
                     </a>
                 </c:otherwise>
             </c:choose>
@@ -56,19 +56,19 @@
             🏠 Inicio & Perfil
         </button>
         <button class="tab-link" onclick="openTab(event, 'sec-unidades')">
-            📚 Unidades & Entregables
+            📚 Unidades & Entregables (${entregables.size()} Trabajos)
         </button>
         <button class="tab-link" onclick="openTab(event, 'sec-metricas')">
             📊 Avance Curricular
         </button>
         <button class="tab-link" onclick="openTab(event, 'sec-admin')">
-            ⚙️ ${not empty sessionScope.usuario ? 'Gestión de Subida' : 'Información del Sistema'}
+            ⚙️ ${not empty sessionScope.usuario ? 'Subir Nuevo Trabajo' : 'Información del Sistema'}
         </button>
     </nav>
 
-    <!-- PESTAÑA 1: INICIO & PERFIL DEL ESTUDIANTE / DOCENTE -->
+    <!-- PESTAÑA 1: INICIO & PERFIL DE ALESSANDER MEZA GARAY -->
     <div id="sec-inicio" class="tab-content active">
-        <!-- TARJETA DEL ESTUDIANTE AUTOR -->
+        <!-- TARJETA DEL ESTUDIANTE -->
         <div class="card">
             <div class="card-title-row">
                 <h2>Estudiante Autor del Portafolio</h2>
@@ -79,7 +79,7 @@
                 <img src="${pageContext.request.contextPath}/img/alessander.jpg" alt="Alessander Meza Garay" class="profile-avatar-img">
                 <div>
                     <h3 style="font-size: 1.4rem; font-weight: 800; color: #ffffff;">Alessander Meza Garay</h3>
-                    <p style="color: var(--text-accent); font-size: 0.9rem; font-weight: 600;">Código Universitario: r03396b</p>
+                    <p style="color: var(--text-accent); font-size: 0.9rem; font-weight: 700;">Código Universitario: r03396b</p>
                     <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">
                         Estudiante del VII Ciclo &bull; Universidad Peruana Los Andes (UPLA) &bull; Huancayo
                     </p>
@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <!-- TARJETA DEL DOCENTE CÁTEDRA -->
+        <!-- TARJETA DOCENTE DE CÁTEDRA -->
         <div class="card">
             <div class="card-title-row">
                 <h2>Docente de la Asignatura</h2>
@@ -122,12 +122,12 @@
         </div>
     </div>
 
-    <!-- PESTAÑA 2: UNIDADES Y TABLA DE ENTREGABLES CON VISTA EN PANTALLA -->
+    <!-- PESTAÑA 2: UNIDADES Y TABLA DE ENTREGABLES MÚLTIPLES -->
     <div id="sec-unidades" class="tab-content">
-        <!-- 4 UNIDADES DEL SÍLABO -->
+        <!-- RESUMEN DE LAS 4 UNIDADES -->
         <div class="card">
             <div class="card-title-row">
-                <h2>Resumen de Unidades Académicas (Sílabo Oficial)</h2>
+                <h2>Programación de Unidades Académicas (Sílabo Oficial)</h2>
                 <span style="font-size: 0.8rem; color: var(--text-secondary);">4 Unidades &bull; 16 Semanas</span>
             </div>
 
@@ -144,8 +144,8 @@
                                 <div class="progress-fill" style="width: ${(u.semanasCompletadas / 4.0) * 100}%;"></div>
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.775rem; color: var(--text-accent); font-weight: 700;">
-                                <span>Avance: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
-                                <span>${u.semanasCompletadas} de 4 Semanas</span>
+                                <span>Progreso: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
+                                <span>${u.semanasCompletadas} Archivos Subidos</span>
                             </div>
                         </div>
                     </div>
@@ -153,81 +153,94 @@
             </div>
         </div>
 
-        <!-- TABLA DE ENTREGABLES CON OPCIÓN DE VISTA SIN DESCARGAR -->
+        <!-- TABLA CON SOPORTE PARA MÚLTIPLES TRABAJOS Y VISOR EN PANTALLA -->
         <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="font-size: 1.1rem; font-weight: 800;">Entregables y Trabajos por Semana</h2>
-                <span style="font-size: 0.8rem; color: var(--text-secondary);">Haz clic en "Ver Documento" para leer sin descargar</span>
+                <div>
+                    <h2 style="font-size: 1.1rem; font-weight: 800;">Lista de Trabajos y Entregables por Semana</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Puedes subir más de 1 trabajo por semana y asignarles un título personalizado</p>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openTab(event, 'sec-admin')">
+                    ➕ Subir Nuevo Trabajo
+                </button>
             </div>
 
             <div class="table-container">
                 <table class="clean-table">
                     <thead>
                         <tr>
-                            <th>Sem.</th>
+                            <th>Semana</th>
                             <th>Tema del Sílabo</th>
+                            <th>Título del Trabajo / Archivo</th>
                             <th>Estado</th>
-                            <th>Archivo Adjunto</th>
                             <th style="text-align: right;">Acciones de Visualización</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <c:forEach var="e" items="${entregables}">
-                            <tr>
-                                <td>
-                                    <strong style="color: var(--text-accent);">Semana ${e.semana}</strong>
-                                </td>
-                                <td>
-                                    <span style="font-weight: 600;">${RepositorioDAO.getTemaSemana(e.semana)}</span>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${e.completado}">
-                                            <span class="status-pill status-ok">✓ Subido</span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span class="status-pill status-wait">⌛ Pendiente</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${e.completado}">
-                                            <span style="font-size: 0.85rem; color: var(--text-secondary);">
-                                                📄 ${e.nombreArchivo}
-                                            </span>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Sin entregable</span>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td style="text-align: right;">
-                                    <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
-                                        <c:if test="${e.completado}">
-                                            <!-- VER EN PANTALLA SIN DESCARGAR (MODAL VIEWER) -->
-                                            <button type="button" class="btn btn-primary btn-sm" onclick="openDocViewer('${e.archivoUrl}', '${e.nombreArchivo}')">
-                                                👁️ Ver Documento
-                                            </button>
-                                            <!-- DESCARGAR ARCHIVO -->
-                                            <a href="${e.archivoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar">
-                                                ⬇️ Descargar
-                                            </a>
-                                        </c:if>
-
-                                        <!-- ELIMINAR (SOLO SI TIENE SESIÓN ACTIVA) -->
-                                        <c:if test="${not empty sessionScope.usuario and e.completado}">
-                                            <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar el entregable de la Semana ${e.semana}?');">
-                                                <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="semana" value="${e.semana}">
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    🗑️ Eliminar
+                        <c:forEach var="semIndex" begin="1" end="16">
+                            <c:set var="tieneArchivos" value="false" />
+                            <c:forEach var="e" items="${entregables}">
+                                <c:if test="${e.semana == semIndex}">
+                                    <c:set var="tieneArchivos" value="true" />
+                                    <tr>
+                                        <td>
+                                            <strong style="color: var(--text-accent);">Semana ${e.semana}</strong>
+                                        </td>
+                                        <td>
+                                            <span style="font-size: 0.85rem; font-weight: 600;">${RepositorioDAO.getTemaSemana(e.semana)}</span>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 700; color: #ffffff;">📌 ${e.tituloTrabajo}</div>
+                                            <div style="font-size: 0.775rem; color: var(--text-secondary);">📄 ${e.nombreArchivo}</div>
+                                        </td>
+                                        <td>
+                                            <span class="status-pill status-ok">✓ Disponible</span>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                                                <!-- BOTÓN VISTA PREVIA EN PANTALLA -->
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="openDocViewer('${e.archivoUrl}', '${e.tituloTrabajo}')">
+                                                    👁️ Ver en Pantalla
                                                 </button>
-                                            </form>
-                                        </c:if>
-                                    </div>
-                                </td>
-                            </tr>
+                                                <!-- BOTÓN DESCARGAR -->
+                                                <a href="${e.archivoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar archivo">
+                                                    ⬇️ Descargar
+                                                </a>
+                                                <!-- BOTÓN ELIMINAR (SI HAY SESIÓN) -->
+                                                <c:if test="${not empty sessionScope.usuario}">
+                                                    <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Eliminar el trabajo \'${e.tituloTrabajo}\'?');">
+                                                        <input type="hidden" name="action" value="delete">
+                                                        <input type="hidden" name="id" value="${e.id}">
+                                                        <button type="submit" class="btn btn-danger btn-sm">
+                                                            🗑️ Eliminar
+                                                        </button>
+                                                    </form>
+                                                </c:if>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </c:if>
+                            </c:forEach>
+
+                            <!-- SI LA SEMANA NO TIENE TRABAJOS AÚN -->
+                            <c:if test="${not tieneArchivos}">
+                                <tr>
+                                    <td>
+                                        <span style="color: var(--text-muted);">Semana ${semIndex}</span>
+                                    </td>
+                                    <td>
+                                        <span style="font-size: 0.85rem; color: var(--text-secondary);">${RepositorioDAO.getTemaSemana(semIndex)}</span>
+                                    </td>
+                                    <td colspan="2">
+                                        <span class="status-pill status-wait">⌛ Sin entregables aún</span>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="openTab(event, 'sec-admin')">
+                                            ➕ Agregar Trabajo
+                                        </button>
+                                    </td>
+                                </tr>
+                            </c:if>
                         </c:forEach>
                     </tbody>
                 </table>
@@ -239,8 +252,8 @@
     <div id="sec-metricas" class="tab-content">
         <div class="card">
             <div class="card-title-row">
-                <h2>Gráfico de Progreso por Unidades</h2>
-                <span style="font-size: 0.8rem; color: var(--text-accent);">Procesado dinámicamente con Chart.js</span>
+                <h2>Gráfico de Progreso de Entregables</h2>
+                <span style="font-size: 0.8rem; color: var(--text-accent);">Estadísticas dinámicas con Chart.js</span>
             </div>
 
             <div style="position: relative; height: 300px; width: 100%;">
@@ -248,39 +261,46 @@
             </div>
 
             <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: var(--text-secondary);">Avance total de entregables del semestre:</span>
-                <strong style="color: var(--text-accent); font-size: 1.1rem;">${porcentajeProgreso}% (${totalSubidos} de 16 semanas entregadas)</strong>
+                <span style="color: var(--text-secondary);">Total de archivos cargados al repositorio:</span>
+                <strong style="color: var(--text-accent); font-size: 1.1rem;">${entregables.size()} Archivos Subidos</strong>
             </div>
         </div>
     </div>
 
-    <!-- PESTAÑA 4: GESTIÓN DE SUBIDA Y EDICIÓN -->
+    <!-- PESTAÑA 4: FORMULARIO DE SUBIDA CON NOMBRE DE TRABAJO -->
     <div id="sec-admin" class="tab-content">
         <c:choose>
             <c:when test="${not empty sessionScope.usuario}">
                 <div class="card">
                     <div class="card-title-row">
-                        <h2>Formulario de Subida de Entregables</h2>
-                        <span class="status-pill status-ok">Sesión Activa: ${sessionScope.usuario.nombre}</span>
+                        <h2>Formulario de Carga de Trabajos</h2>
+                        <span class="status-pill status-ok">Usuario: Alessander Meza Garay</span>
                     </div>
 
                     <form action="${pageContext.request.contextPath}/upload" method="post" enctype="multipart/form-data">
                         <div class="form-group">
-                            <label class="form-label">Seleccionar Semana (1 al 16):</label>
+                            <label class="form-label">Seleccionar Semana del Sílabo (1 al 16):</label>
                             <select name="semana" class="form-control" required>
-                                <c:forEach var="item" items="${entregables}">
-                                    <option value="${item.semana}">
-                                        Semana ${item.semana}: ${RepositorioDAO.getTemaSemana(item.semana)} - [${item.completado ? 'Ya subido' : 'Pendiente'}]
+                                <c:forEach var="w" begin="1" end="16">
+                                    <option value="${w}">
+                                        Semana ${w}: ${RepositorioDAO.getTemaSemana(w)}
                                     </option>
                                 </c:forEach>
                             </select>
                         </div>
+
                         <div class="form-group">
-                            <label class="form-label">Adjuntar Archivo o Foto del Trabajo (PDF, Imagen, Documento):</label>
+                            <label class="form-label">Nombre / Título del Trabajo (Ej: "Informe de Casos de Uso - Semana 6"):</label>
+                            <input type="text" name="tituloTrabajo" class="form-control" placeholder="Escribe el nombre o título de la actividad..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Adjuntar Archivo o Imagen (PDF, PNG, JPG, DOCX, ZIP):</label>
                             <input type="file" name="archivo" class="form-control" required>
                         </div>
+
                         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                            📤 Subir Entregable a Supabase Storage
+                            📤 Cargar Trabajo al Repositorio Supabase
                         </button>
                     </form>
                 </div>
@@ -288,9 +308,9 @@
 
             <c:otherwise>
                 <div class="card" style="text-align: center; padding: 3rem 1.5rem;">
-                    <h2 style="font-size: 1.3rem; margin-bottom: 0.75rem;">Acceso a Modificación de Entregables</h2>
+                    <h2 style="font-size: 1.3rem; margin-bottom: 0.75rem;">Acceso para Modificar Trabajos</h2>
                     <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.5rem auto;">
-                        Para poder subir nuevos archivos, actualizar evidencias o eliminar entregables, debes iniciar sesión con tu cuenta de alumno administrador.
+                        Debes iniciar sesión como alumno administrador para subir nuevos archivos, asignar nombres a tus trabajos o eliminar entregables.
                     </p>
                     <a href="${pageContext.request.contextPath}/auth" class="btn btn-primary">
                         🔐 Iniciar Sesión como Alessander Meza Garay
@@ -300,15 +320,15 @@
         </c:choose>
     </div>
 
-    <!-- MODAL DE VISUALIZACIÓN EN PANTALLA ("VER SIN DESCARGAR") -->
+    <!-- VISOR FLOTANTE PARA VER ARCHIVOS E IMÁGENES EN PANTALLA SIN DESCARGAR -->
     <div id="docViewerModal" class="modal-backdrop">
         <div class="modal-window">
             <div class="modal-header">
-                <h3 id="modalDocTitle" style="font-size: 1rem; color: #ffffff;">Vista Previa de Entregables</h3>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">✕ Cerrar</button>
+                <h3 id="modalDocTitle" style="font-size: 1rem; color: #ffffff;">Visor de Documentos UPLA</h3>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">✕ Cerrar Visor</button>
             </div>
             <div class="modal-body" id="modalDocContainer">
-                <!-- Se inyecta dinámicamente el iframe o imagen -->
+                <!-- Se inyecta dinámicamente el visor -->
             </div>
         </div>
     </div>
@@ -320,9 +340,8 @@
     </footer>
 </div>
 
-<!-- SCRIPTS DE NAVEGACIÓN Y PREVISUALIZADOR -->
+<!-- SCRIPTS DE PESTAÑAS Y MEJORADO VISOR DE DOCUMENTOS -->
 <script>
-    // Cambio de pestañas limpia
     function openTab(evt, tabId) {
         const contents = document.getElementsByClassName("tab-content");
         for (let i = 0; i < contents.length; i++) {
@@ -336,19 +355,27 @@
         evt.currentTarget.classList.add("active");
     }
 
-    // Modal de visualización sin descargar
-    function openDocViewer(url, fileName) {
+    // VISOR DE IMÁGENES Y DOCUMENTOS EN PANTALLA SIN DESCARGAR
+    function openDocViewer(url, title) {
         const modal = document.getElementById("docViewerModal");
-        const title = document.getElementById("modalDocTitle");
+        const modalTitle = document.getElementById("modalDocTitle");
         const container = document.getElementById("modalDocContainer");
 
-        title.textContent = "📄 Viendo: " + fileName;
+        modalTitle.textContent = "📖 Viendo: " + title;
 
-        // Si es imagen o PDF, inyectar el visor adecuado
+        // Si es una imagen (.jpg, .png, .gif, .webp)
         if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-            container.innerHTML = `<img src="${url}" alt="${fileName}">`;
-        } else {
-            container.innerHTML = `<iframe src="${url}"></iframe>`;
+            container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain;">`;
+        } 
+        // Si es un archivo PDF o documento
+        else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
+            container.innerHTML = `<object data="${url}" type="application/pdf" width="100%" height="520px">
+                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>
+            </object>`;
+        } 
+        // Fallback visor Google Docs para otros formatos
+        else {
+            container.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>`;
         }
 
         modal.classList.add("active");
@@ -377,7 +404,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Semanas Entregadas (de 4)',
+                    label: 'Archivos Entregados por Unidad',
                     data: dataCompletadas,
                     backgroundColor: 'rgba(0, 82, 204, 0.85)',
                     borderColor: '#0052cc',
@@ -391,7 +418,6 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: 4,
                         ticks: { stepSize: 1, color: '#94a3b8' },
                         grid: { color: 'rgba(255, 255, 255, 0.08)' }
                     },

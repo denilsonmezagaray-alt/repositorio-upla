@@ -1,24 +1,22 @@
 -- =============================================================================
--- REPOSITY UPLA - ARQUITECTURA DE SOFTWARE
--- Script de Creación e Inserción Inicial (Seed) para Supabase PostgreSQL
--- Autor / Estudiante: Alessander (Ingeniería de Sistemas - UPLA)
--- Institución: Universidad Peruana Los Andes (UPLA)
+-- REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE 2026-I
+-- Script de Creación e Inserción Inicial para Supabase PostgreSQL
+-- Autor: Alessander Meza Garay (Código: r03396b)
 -- =============================================================================
 
--- 1. Eliminar tablas si existen (Limpieza segura)
 DROP TABLE IF EXISTS entregables CASCADE;
 DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS unidades CASCADE;
 
--- 2. Tabla de Unidades Académicas (4 Unidades)
+-- 1. Tabla de Unidades Académicas
 CREATE TABLE unidades (
     id SERIAL PRIMARY KEY,
     numero INT UNIQUE NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
     descripcion TEXT
 );
 
--- 3. Tabla de Usuarios (Administradores y Estudiantes)
+-- 2. Tabla de Usuarios
 CREATE TABLE usuarios (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(120) NOT NULL,
@@ -28,52 +26,29 @@ CREATE TABLE usuarios (
     fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 4. Tabla de Entregables / Archivos por Semana (16 Semanas)
+-- 3. Tabla de Entregables (Soporta múltiples archivos por semana y título personalizado)
 CREATE TABLE entregables (
     id SERIAL PRIMARY KEY,
-    semana INT UNIQUE NOT NULL CHECK (semana BETWEEN 1 AND 16),
+    semana INT NOT NULL CHECK (semana BETWEEN 1 AND 16),
     unidad_id INT NOT NULL REFERENCES unidades(id) ON DELETE CASCADE,
-    nombre_archivo VARCHAR(255),
-    archivo_url TEXT,
+    titulo_trabajo VARCHAR(255) NOT NULL,
+    nombre_archivo VARCHAR(255) NOT NULL,
+    archivo_url TEXT NOT NULL,
     fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =============================================================================
--- INSERCIÓN DE DATOS SEMILLA (SEED DATA)
--- =============================================================================
-
--- Inserción de las 4 Unidades Académicas
+-- Datos Semilla de Unidades
 INSERT INTO unidades (numero, nombre, descripcion) VALUES 
-(1, 'Unidad I: Fundamentos y Patrones Arquitectónicos', 'Introducción a la arquitectura de software, atributos de calidad y patrones de diseño iniciales.'),
-(2, 'Unidad II: Arquitectura Orientada a Servicios (SOA) y Microservicios', 'Diseño de servicios RESTful, desacoplamiento, APIs y orquestación de sistemas distribuidos.'),
-(3, 'Unidad III: Arquitectura de Datos y Persistencia', 'Patrón MVC, JDBC, ORM, Supabase PostgreSQL y gestión de almacenamiento en la nube.'),
-(4, 'Unidad IV: Despliegue, DevOps y Contenedores', 'Dockerización con Tomcat 9, integración continua y despliegue automatizado en PaaS (Render).');
+(1, 'Fundamentos y Estándares de Arquitectura', 'Introducción, ISO/IEC 25010, Estilos y Vistas 4+1'),
+(2, 'Modelado de Arquitecturas con POO y Vistas 4+1', 'Principios POO, Diagramas UML y Componentes'),
+(3, 'Comunicación, Integración y Servicios Web REST', 'Protocolos de Integración, REST APIs y JSON/XML'),
+(4, 'Frameworks Modernos y Despliegue en Cloud', 'Patrón Java EE MVC, Tomcat 9, Docker y Render');
 
--- Inserción de las 16 Semanas registradas (Inicialmente sin archivo adjunto)
-INSERT INTO entregables (semana, unidad_id, nombre_archivo, archivo_url) VALUES 
-(1, 1, NULL, NULL),
-(2, 1, NULL, NULL),
-(3, 1, NULL, NULL),
-(4, 1, NULL, NULL),
-(5, 2, NULL, NULL),
-(6, 2, NULL, NULL),
-(7, 2, NULL, NULL),
-(8, 2, NULL, NULL),
-(9, 3, NULL, NULL),
-(10, 3, NULL, NULL),
-(11, 3, NULL, NULL),
-(12, 3, NULL, NULL),
-(13, 4, NULL, NULL),
-(14, 4, NULL, NULL),
-(15, 4, NULL, NULL),
-(16, 4, NULL, NULL);
+-- Datos Semilla Iniciales de Trabajos
+INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url) VALUES 
+(1, 1, 'Informe de Introducción a la Arquitectura', 'Semana_01_Patrones_Arquitectonicos_Alessander.pdf', 'https://upla.edu.pe/repositorio/docs/Semana_01_Patrones.pdf'),
+(2, 1, 'Diagrama MVC y Caso de Estudio UPLA', 'Semana_02_Diagrama_MVC_UPLA.png', 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80');
 
--- Inserción del Usuario Administrador Principal: Alessander (Ingeniería de Sistemas - UPLA)
--- Nota: La contraseña está almacenada como texto de demostración o hash
+-- Usuario Administrador Principal
 INSERT INTO usuarios (nombre, usuario, clave, foto_url) VALUES 
-('Alessander (Ing. Sistemas - UPLA)', 'alessander', 'upla2026', 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80');
-
--- Verificación de Inserción
-SELECT * FROM unidades ORDER BY numero;
-SELECT * FROM usuarios;
-SELECT * FROM entregables ORDER BY semana;
+('Alessander Meza Garay (Código: r03396b)', 'alessander', 'upla2026', 'img/alessander.jpg');

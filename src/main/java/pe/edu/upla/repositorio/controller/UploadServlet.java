@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Controlador de Gestión de Archivos / Entregables: UploadServlet
+ * Controlador de Gestión de Archivos / Entregables (Múltiples Archivos por Semana)
  * Institución: Universidad Peruana Los Andes (UPLA)
- * Autor / Estudiante: Alessander (Ingeniería de Sistemas)
+ * Autor / Estudiante: Alessander Meza Garay (Código: r03396b)
  * Curso: Arquitectura de Software
  */
 @WebServlet(name = "UploadServlet", urlPatterns = {"/upload"})
@@ -65,6 +65,7 @@ public class UploadServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             int semana = Integer.parseInt(request.getParameter("semana"));
+            String tituloTrabajo = request.getParameter("tituloTrabajo");
             Part archivoPart = request.getPart("archivo");
 
             if (archivoPart != null && archivoPart.getSize() > 0) {
@@ -77,8 +78,8 @@ public class UploadServlet extends HttpServlet {
                     archivoUrl = SupabaseStorageService.uploadFile("assignments", originalFilename, is, contentType);
                 }
 
-                // Guardar/Actualizar en la base de datos PostgreSQL
-                repositorioDAO.guardarEntregable(semana, originalFilename, archivoUrl);
+                // Guardar nuevo registro con Título Personalizado en PostgreSQL/Memoria
+                repositorioDAO.guardarEntregable(semana, tituloTrabajo, originalFilename, archivoUrl);
                 response.sendRedirect(request.getContextPath() + "/index?msg=upload_success&week=" + semana);
             } else {
                 response.sendRedirect(request.getContextPath() + "/index?error=no_file_selected");
@@ -91,9 +92,9 @@ public class UploadServlet extends HttpServlet {
     private void procesarEliminacion(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            int semana = Integer.parseInt(request.getParameter("semana"));
-            repositorioDAO.eliminarEntregable(semana);
-            response.sendRedirect(request.getContextPath() + "/index?msg=delete_success&week=" + semana);
+            int id = Integer.parseInt(request.getParameter("id"));
+            repositorioDAO.eliminarEntregable(id);
+            response.sendRedirect(request.getContextPath() + "/index?msg=delete_success");
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/index?error=delete_failed");
         }

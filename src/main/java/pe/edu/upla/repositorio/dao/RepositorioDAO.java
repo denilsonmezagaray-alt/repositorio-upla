@@ -9,13 +9,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * DAO con JDBC Puro a Supabase PostgreSQL y Almacenamiento en Memoria
  * Institución: Universidad Peruana Los Andes (UPLA)
- * Autor / Estudiante: Alessander (Ingeniería de Sistemas y Computación)
+ * Autor / Estudiante: Alessander Meza Garay (Código: r03396b)
  * Docente: Mg. Raúl Enrique Fernández Bejarano
  * Curso: Arquitectura de Software (Código: 332181)
  */
@@ -23,10 +24,8 @@ public class RepositorioDAO {
     private static final Logger LOGGER = Logger.getLogger(RepositorioDAO.class.getName());
 
     private static List<Entregable> MEMORIA_ENTREGABLES = null;
+    private static final AtomicInteger AUTO_ID = new AtomicInteger(100);
 
-    /**
-     * Nombres oficiales de las 16 Semanas según el Sílabo oficial UPLA 2026-I
-     */
     private static final String[] TEMAS_SILABO = {
         "Semana 01: Introducción a la Arquitectura de Software y Conceptos Fundamentales",
         "Semana 02: Principios, Atributos de Calidad (ISO/IEC 25010) y Estándares",
@@ -50,33 +49,37 @@ public class RepositorioDAO {
         if (MEMORIA_ENTREGABLES == null) {
             MEMORIA_ENTREGABLES = new ArrayList<>();
             String[] nombresUnidad = {
-                "Unidad I: Fundamentos y Estándares de Arquitectura",
-                "Unidad II: Modelado de Arquitectura con POO y UML",
-                "Unidad III: Comunicación e Integración con APIs REST",
-                "Unidad IV: Frameworks y Despliegue Cloud (Tomcat & Render)"
+                "Fundamentos y Estándares de Arquitectura",
+                "Modelado de Arquitecturas con POO y Vistas 4+1",
+                "Comunicación, Integración y Servicios Web REST",
+                "Frameworks Modernos y Despliegue en Cloud"
             };
 
-            for (int i = 1; i <= 16; i++) {
-                int unidadNum = ((i - 1) / 4) + 1;
-                Entregable ent = new Entregable();
-                ent.setId(i);
-                ent.setSemana(i);
-                ent.setUnidadId(unidadNum);
-                ent.setUnidadNumero(unidadNum);
-                ent.setNombreUnidad(nombresUnidad[unidadNum - 1]);
+            // Trabajo de demostración 1
+            Entregable e1 = new Entregable();
+            e1.setId(1);
+            e1.setSemana(1);
+            e1.setUnidadId(1);
+            e1.setUnidadNumero(1);
+            e1.setNombreUnidad(nombresUnidad[0]);
+            e1.setTituloTrabajo("Informe de Introducción a la Arquitectura");
+            e1.setNombreArchivo("Semana_01_Patrones_Arquitectonicos_Alessander.pdf");
+            e1.setArchivoUrl("https://upla.edu.pe/repositorio/docs/Semana_01_Patrones.pdf");
+            e1.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e1);
 
-                if (i == 1) {
-                    ent.setNombreArchivo("Semana_01_Patrones_Arquitectonicos_Alessander.pdf");
-                    ent.setArchivoUrl("https://upla.edu.pe/repositorio/docs/Semana_01_Patrones.pdf");
-                } else if (i == 2) {
-                    ent.setNombreArchivo("Semana_02_Diagrama_MVC_UPLA.png");
-                    ent.setArchivoUrl("https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80");
-                } else {
-                    ent.setNombreArchivo(null);
-                    ent.setArchivoUrl(null);
-                }
-                MEMORIA_ENTREGABLES.add(ent);
-            }
+            // Trabajo de demostración 2
+            Entregable e2 = new Entregable();
+            e2.setId(2);
+            e2.setSemana(2);
+            e2.setUnidadId(1);
+            e2.setUnidadNumero(1);
+            e2.setNombreUnidad(nombresUnidad[0]);
+            e2.setTituloTrabajo("Diagrama MVC y Caso de Estudio UPLA");
+            e2.setNombreArchivo("Semana_02_Diagrama_MVC_UPLA.png");
+            e2.setArchivoUrl("https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80");
+            e2.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e2);
         }
         return MEMORIA_ENTREGABLES;
     }
@@ -136,10 +139,10 @@ public class RepositorioDAO {
     public List<Entregable> obtenerEntregables() {
         List<Entregable> lista = new ArrayList<>();
         String sql = "SELECT e.id, e.semana, e.unidad_id, u.numero AS unidad_numero, u.nombre AS nombre_unidad, " +
-                     "e.nombre_archivo, e.archivo_url, e.fecha_subida " +
+                     "e.titulo_trabajo, e.nombre_archivo, e.archivo_url, e.fecha_subida " +
                      "FROM entregables e " +
                      "INNER JOIN unidades u ON e.unidad_id = u.id " +
-                     "ORDER BY e.semana ASC";
+                     "ORDER BY e.semana ASC, e.id ASC";
 
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -152,13 +155,14 @@ public class RepositorioDAO {
                 ent.setUnidadId(rs.getInt("unidad_id"));
                 ent.setUnidadNumero(rs.getInt("unidad_numero"));
                 ent.setNombreUnidad(rs.getString("nombre_unidad"));
+                ent.setTituloTrabajo(rs.getString("titulo_trabajo"));
                 ent.setNombreArchivo(rs.getString("nombre_archivo"));
                 ent.setArchivoUrl(rs.getString("archivo_url"));
                 ent.setFechaSubida(rs.getTimestamp("fecha_subida"));
                 lista.add(ent);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Usando datos persistentes en memoria para entregables: " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Usando datos en memoria para entregables: " + e.getMessage());
             return getMemoriaEntregables();
         }
 
@@ -169,54 +173,67 @@ public class RepositorioDAO {
         return lista;
     }
 
-    public boolean guardarEntregable(int semana, String nombreArchivo, String archivoUrl) {
-        String sql = "UPDATE entregables SET nombre_archivo = ?, archivo_url = ?, fecha_subida = CURRENT_TIMESTAMP WHERE semana = ?";
+    /**
+     * Permite subir MÚLTIPLES archivos por semana con su TÍTULO PERSONALIZADO.
+     */
+    public boolean guardarEntregable(int semana, String tituloTrabajo, String nombreArchivo, String archivoUrl) {
+        int unidadNum = ((semana - 1) / 4) + 1;
+        String sql = "INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url, fecha_subida) " +
+                     "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+        
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setString(1, nombreArchivo);
-            ps.setString(2, archivoUrl);
-            ps.setInt(3, semana);
+            ps.setInt(1, semana);
+            ps.setInt(2, unidadNum);
+            ps.setString(3, tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
+            ps.setString(4, nombreArchivo);
+            ps.setString(5, archivoUrl);
 
             ps.executeUpdate();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al guardar entregable en BD: " + e.getMessage());
         }
 
-        List<Entregable> memoria = getMemoriaEntregables();
-        for (Entregable e : memoria) {
-            if (e.getSemana() == semana) {
-                e.setNombreArchivo(nombreArchivo);
-                e.setArchivoUrl(archivoUrl);
-                e.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
-                break;
-            }
-        }
+        // Sincronizar en memoria compartida (Soporta múltiples entregables)
+        String[] nombresUnidad = {
+            "Fundamentos y Estándares de Arquitectura",
+            "Modelado de Arquitecturas con POO y Vistas 4+1",
+            "Comunicación, Integración y Servicios Web REST",
+            "Frameworks Modernos y Despliegue en Cloud"
+        };
 
+        Entregable nuevo = new Entregable();
+        nuevo.setId(AUTO_ID.incrementAndGet());
+        nuevo.setSemana(semana);
+        nuevo.setUnidadId(unidadNum);
+        nuevo.setUnidadNumero(unidadNum);
+        nuevo.setNombreUnidad(nombresUnidad[unidadNum - 1]);
+        nuevo.setTituloTrabajo(tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
+        nuevo.setNombreArchivo(nombreArchivo);
+        nuevo.setArchivoUrl(archivoUrl);
+        nuevo.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+
+        getMemoriaEntregables().add(nuevo);
         return true;
     }
 
-    public boolean eliminarEntregable(int semana) {
-        String sql = "UPDATE entregables SET nombre_archivo = NULL, archivo_url = NULL, fecha_subida = NULL WHERE semana = ?";
+    /**
+     * Elimina un archivo específico por su ID único.
+     */
+    public boolean eliminarEntregable(int id) {
+        String sql = "DELETE FROM entregables WHERE id = ?";
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
-            ps.setInt(1, semana);
+            ps.setInt(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al eliminar entregable en BD: " + e.getMessage());
         }
 
         List<Entregable> memoria = getMemoriaEntregables();
-        for (Entregable e : memoria) {
-            if (e.getSemana() == semana) {
-                e.setNombreArchivo(null);
-                e.setArchivoUrl(null);
-                e.setFechaSubida(null);
-                break;
-            }
-        }
-
+        memoria.removeIf(e -> e.getId() == id);
         return true;
     }
 
@@ -229,16 +246,12 @@ public class RepositorioDAO {
 
         for (Unidad u : unidades) {
             int completadas = 0;
-            int total = 0;
             for (Entregable e : entregables) {
-                if (e.getUnidadNumero() == u.getNumero()) {
-                    total++;
-                    if (e.isCompletado()) {
-                        completadas++;
-                    }
+                if (e.getUnidadNumero() == u.getNumero() && e.isCompletado()) {
+                    completadas++;
                 }
             }
-            u.setTotalSemanas(total > 0 ? total : 4);
+            u.setTotalSemanas(4);
             u.setSemanasCompletadas(completadas);
         }
         return unidades;
