@@ -37,6 +37,9 @@
             if (activeBtn) {
                 activeBtn.classList.add("active");
             }
+            if (tabId === 'sec-metricas' && typeof renderChart === 'function') {
+                setTimeout(renderChart, 50);
+            }
         }
     </script>
 </head>
@@ -432,10 +435,15 @@
         modal.classList.remove("active");
     }
 
-    // Gráfico de Chart.js
-    document.addEventListener("DOMContentLoaded", function() {
+    var myChart = null;
+
+    function renderChart() {
         const canvas = document.getElementById('unidadesChart');
         if (!canvas) return;
+
+        if (myChart) {
+            myChart.destroy();
+        }
         
         try {
             const ctx = canvas.getContext('2d');
@@ -447,7 +455,7 @@
                 dataCompletadas.push(${u.semanasCompletadas});
             </c:forEach>
 
-            new Chart(ctx, {
+            myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -482,8 +490,12 @@
                 }
             });
         } catch (e) {
-            console.log("Chart initialization skipped: ", e);
+            console.log("Error rendering chart:", e);
         }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        renderChart();
     });
 </script>
 
