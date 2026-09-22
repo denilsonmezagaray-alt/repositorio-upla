@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  =============================================================================
+  REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE
+  Estudiante / Autor: Alessander (Ingeniería de Sistemas - UPLA)
+  =============================================================================
+-->
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <display-name>Repositorio UPLA - Arquitectura de Software</display-name>
+
+    <welcome-file-list>
+        <welcome-file>index</welcome-file>
+    </welcome-file-list>
+
+    <!-- Mapeos Servlet opcionales (también se usan anotaciones @WebServlet) -->
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+</web-app>

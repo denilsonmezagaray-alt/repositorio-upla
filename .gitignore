@@ -1,0 +1,32 @@
+# Target de Maven
+target/
+*.war
+*.ear
+*.rar
+*.jar
+
+# IDE & Editor Configuration
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Local Environment Variables
+.env
+.env.local
