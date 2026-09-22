@@ -18,6 +18,27 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function openTab(tabId) {
+            console.log("Cambiando a pestaña:", tabId);
+            var panes = document.getElementsByClassName("tab-pane");
+            for (var i = 0; i < panes.length; i++) {
+                panes[i].style.display = "none";
+            }
+            var buttons = document.getElementsByClassName("tab-link");
+            for (var j = 0; j < buttons.length; j++) {
+                buttons[j].classList.remove("active");
+            }
+            var target = document.getElementById(tabId);
+            if (target) {
+                target.style.display = "block";
+            }
+            var activeBtn = document.querySelector('.tab-link[data-tab="' + tabId + '"]');
+            if (activeBtn) {
+                activeBtn.classList.add("active");
+            }
+        }
+    </script>
 </head>
 <body>
 
