@@ -6,8 +6,8 @@
   =============================================================================
   REPOSITORIO UNIVERSITARIO UPLA - ARQUITECTURA DE SOFTWARE 2026-I
   Estudiante / Autor: Alessander Meza Garay (Código: r03396b)
+  Correo Institucional: r03396b@ms.upla.edu.pe
   Docente: Mg. Raúl Enrique Fernández Bejarano
-  Vista Principal: index.jsp (Múltiples Trabajos por Semana & Visor de Archivos)
   =============================================================================
 -->
 <!DOCTYPE html>
@@ -50,24 +50,24 @@
         </div>
     </header>
 
-    <!-- MENÚ DE NAVEGACIÓN SIMPLIFICADO POR PESTAÑAS -->
+    <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS (CLICK ROBUSTO) -->
     <nav class="nav-tabs">
-        <button class="tab-link active" onclick="openTab(event, 'sec-inicio')">
+        <button type="button" class="tab-link active" data-tab="sec-inicio" onclick="openTab('sec-inicio')">
             🏠 Inicio & Perfil
         </button>
-        <button class="tab-link" onclick="openTab(event, 'sec-unidades')">
+        <button type="button" class="tab-link" data-tab="sec-unidades" onclick="openTab('sec-unidades')">
             📚 Unidades & Entregables (${entregables.size()} Trabajos)
         </button>
-        <button class="tab-link" onclick="openTab(event, 'sec-metricas')">
+        <button type="button" class="tab-link" data-tab="sec-metricas" onclick="openTab('sec-metricas')">
             📊 Avance Curricular
         </button>
-        <button class="tab-link" onclick="openTab(event, 'sec-admin')">
+        <button type="button" class="tab-link" data-tab="sec-admin" onclick="openTab('sec-admin')">
             ⚙️ ${not empty sessionScope.usuario ? 'Subir Nuevo Trabajo' : 'Información del Sistema'}
         </button>
     </nav>
 
     <!-- PESTAÑA 1: INICIO & PERFIL DE ALESSANDER MEZA GARAY -->
-    <div id="sec-inicio" class="tab-content active">
+    <div id="sec-inicio" class="tab-pane" style="display: block;">
         <!-- TARJETA DEL ESTUDIANTE -->
         <div class="card">
             <div class="card-title-row">
@@ -89,7 +89,7 @@
             <div class="profile-meta-grid">
                 <div class="info-box">
                     <div class="info-box-label">Correo Institucional</div>
-                    <div class="info-box-value" style="color: var(--text-accent);">s01269h@upla.edu.pe</div>
+                    <div class="info-box-value" style="color: var(--text-accent);">r03396b@ms.upla.edu.pe</div>
                 </div>
                 <div class="info-box">
                     <div class="info-box-label">Asignatura</div>
@@ -123,7 +123,7 @@
     </div>
 
     <!-- PESTAÑA 2: UNIDADES Y TABLA DE ENTREGABLES MÚLTIPLES -->
-    <div id="sec-unidades" class="tab-content">
+    <div id="sec-unidades" class="tab-pane" style="display: none;">
         <!-- RESUMEN DE LAS 4 UNIDADES -->
         <div class="card">
             <div class="card-title-row">
@@ -158,9 +158,9 @@
             <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <h2 style="font-size: 1.1rem; font-weight: 800;">Lista de Trabajos y Entregables por Semana</h2>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Puedes subir más de 1 trabajo por semana y asignarles un título personalizado</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Puedes subir más de 1 trabajo por semana y verlos directamente en pantalla</p>
                 </div>
-                <button type="button" class="btn btn-primary btn-sm" onclick="openTab(event, 'sec-admin')">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
                     ➕ Subir Nuevo Trabajo
                 </button>
             </div>
@@ -235,7 +235,7 @@
                                         <span class="status-pill status-wait">⌛ Sin entregables aún</span>
                                     </td>
                                     <td style="text-align: right;">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="openTab(event, 'sec-admin')">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="openTab('sec-admin')">
                                             ➕ Agregar Trabajo
                                         </button>
                                     </td>
@@ -249,7 +249,7 @@
     </div>
 
     <!-- PESTAÑA 3: MÉTRICAS Y GRÁFICO DE AVANCE -->
-    <div id="sec-metricas" class="tab-content">
+    <div id="sec-metricas" class="tab-pane" style="display: none;">
         <div class="card">
             <div class="card-title-row">
                 <h2>Gráfico de Progreso de Entregables</h2>
@@ -268,7 +268,7 @@
     </div>
 
     <!-- PESTAÑA 4: FORMULARIO DE SUBIDA CON NOMBRE DE TRABAJO -->
-    <div id="sec-admin" class="tab-content">
+    <div id="sec-admin" class="tab-pane" style="display: none;">
         <c:choose>
             <c:when test="${not empty sessionScope.usuario}">
                 <div class="card">
@@ -336,23 +336,32 @@
     <!-- FOOTER INSTITUCIONAL -->
     <footer class="footer">
         <p><strong>UNIVERSIDAD PERUANA LOS ANDES &bull; FACULTAD DE INGENIERÍA</strong></p>
-        <p>Portafolio Digital de Arquitectura de Software 2026-I &bull; Desarrollado por <strong>Alessander Meza Garay</strong> (Código: r03396b)</p>
+        <p>Portafolio Digital de Arquitectura de Software 2026-I &bull; Desarrollado por <strong>Alessander Meza Garay</strong> (Código: r03396b &bull; Correo: r03396b@ms.upla.edu.pe)</p>
     </footer>
 </div>
 
-<!-- SCRIPTS DE PESTAÑAS Y MEJORADO VISOR DE DOCUMENTOS -->
+<!-- SCRIPTS DE NAVEGACIÓN DE PESTAÑAS 100% ROBUSTO Y VISOR -->
 <script>
-    function openTab(evt, tabId) {
-        const contents = document.getElementsByClassName("tab-content");
-        for (let i = 0; i < contents.length; i++) {
-            contents[i].classList.remove("active");
+    function openTab(tabId) {
+        // Ocultar todas las secciones de pestañas
+        const panes = document.querySelectorAll(".tab-pane");
+        panes.forEach(pane => pane.style.display = "none");
+
+        // Quitar la clase active de los botones
+        const buttons = document.querySelectorAll(".tab-link");
+        buttons.forEach(btn => btn.classList.remove("active"));
+
+        // Mostrar la sección seleccionada
+        const selectedPane = document.getElementById(tabId);
+        if (selectedPane) {
+            selectedPane.style.display = "block";
         }
-        const links = document.getElementsByClassName("tab-link");
-        for (let i = 0; i < links.length; i++) {
-            links[i].classList.remove("active");
+
+        // Marcar el botón activo correspondiente
+        const activeBtn = document.querySelector(`.tab-link[data-tab="${tabId}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add("active");
         }
-        document.getElementById(tabId).classList.add("active");
-        evt.currentTarget.classList.add("active");
     }
 
     // VISOR DE IMÁGENES Y DOCUMENTOS EN PANTALLA SIN DESCARGAR
@@ -363,18 +372,13 @@
 
         modalTitle.textContent = "📖 Viendo: " + title;
 
-        // Si es una imagen (.jpg, .png, .gif, .webp)
         if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
             container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain;">`;
-        } 
-        // Si es un archivo PDF o documento
-        else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
+        } else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
             container.innerHTML = `<object data="${url}" type="application/pdf" width="100%" height="520px">
                 <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>
             </object>`;
-        } 
-        // Fallback visor Google Docs para otros formatos
-        else {
+        } else {
             container.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>`;
         }
 
