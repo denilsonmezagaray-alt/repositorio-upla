@@ -106,10 +106,10 @@ public class RepositorioDAO {
             if ("alessander".equalsIgnoreCase(username) && "upla2026".equals(password)) {
                 Usuario u = new Usuario();
                 u.setId(1);
-                u.setNombre("Alessander (Ing. Sistemas - UPLA)");
+                u.setNombre("Alessander Meza Garay (Código: r03396b)");
                 u.setUsuario("alessander");
                 u.setClave("upla2026");
-                u.setFotoUrl("https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80");
+                u.setFotoUrl("img/alessander.jpg");
                 return u;
             }
         }
