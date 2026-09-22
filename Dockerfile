@@ -24,9 +24,8 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copiar el archivo WAR generado desde la etapa de compilación como ROOT.war
 COPY --from=build /app/target/ROOT.war /usr/local/tomcat/webapps/ROOT.war
 
-# Exponer el puerto predeterminado de HTTP en Tomcat
-ENV PORT 8080
+# Exponer el puerto predeterminado de HTTP en Tomcat (Render detecta 8080 automáticamente)
 EXPOSE 8080
 
-# Iniciar Tomcat adaptando el puerto al $PORT asignado por Render
-CMD ["sh", "-c", "sed -i \"s/8080/${PORT}/g\" /usr/local/tomcat/conf/server.xml && catalina.sh run"]
+# Iniciar Tomcat
+CMD ["catalina.sh", "run"]
