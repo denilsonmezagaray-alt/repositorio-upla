@@ -413,49 +413,56 @@
 
     // Gráfico de Chart.js
     document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('unidadesChart').getContext('2d');
-        const labels = [];
-        const dataCompletadas = [];
+        const canvas = document.getElementById('unidadesChart');
+        if (!canvas) return;
         
-        <c:forEach var="u" items="${unidades}">
-            labels.push('Unidad ${u.numero}');
-            dataCompletadas.push(${u.semanasCompletadas});
-        </c:forEach>
+        try {
+            const ctx = canvas.getContext('2d');
+            const labels = [];
+            const dataCompletadas = [];
+            
+            <c:forEach var="u" items="${unidades}">
+                labels.push('Unidad ${u.numero}');
+                dataCompletadas.push(${u.semanasCompletadas});
+            </c:forEach>
 
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Archivos Entregados por Unidad',
-                    data: dataCompletadas,
-                    backgroundColor: 'rgba(0, 82, 204, 0.85)',
-                    borderColor: '#0052cc',
-                    borderWidth: 1.5,
-                    borderRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { stepSize: 1, color: '#94a3b8' },
-                        grid: { color: 'rgba(255, 255, 255, 0.08)' }
-                    },
-                    x: {
-                        ticks: { color: '#ffffff', font: { weight: '700' } },
-                        grid: { display: false }
-                    }
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Archivos Entregados por Unidad',
+                        data: dataCompletadas,
+                        backgroundColor: 'rgba(0, 82, 204, 0.85)',
+                        borderColor: '#0052cc',
+                        borderWidth: 1.5,
+                        borderRadius: 6
+                    }]
                 },
-                plugins: {
-                    legend: {
-                        labels: { color: '#ffffff', font: { weight: '700' } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1, color: '#94a3b8' },
+                            grid: { color: 'rgba(255, 255, 255, 0.08)' }
+                        },
+                        x: {
+                            ticks: { color: '#ffffff', font: { weight: '700' } },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff', font: { weight: '700' } }
+                        }
                     }
                 }
-            }
-        });
+            });
+        } catch (e) {
+            console.log("Chart initialization skipped: ", e);
+        }
     });
 </script>
 
