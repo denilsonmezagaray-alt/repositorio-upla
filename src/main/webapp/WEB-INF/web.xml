@@ -13,7 +13,7 @@
     <display-name>Repositorio UPLA - Arquitectura de Software</display-name>
 
     <welcome-file-list>
-        <welcome-file>index</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
     <!-- Mapeos Servlet opcionales (también se usan anotaciones @WebServlet) -->
