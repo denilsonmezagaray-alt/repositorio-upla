@@ -27,5 +27,5 @@ COPY --from=build /app/target/ROOT.war /usr/local/tomcat/webapps/ROOT.war
 # Exponer el puerto predeterminado de HTTP en Tomcat (Render detecta 8080 automáticamente)
 EXPOSE 8080
 
-# Iniciar Tomcat
-CMD ["catalina.sh", "run"]
+# Configurar Tomcat para responder dinámicamente al puerto PORT si está asignado
+CMD ["sh", "-c", "sed -i 's/port=\"8080\"/port=\"'\"${PORT:-8080}\"'\"/g' /usr/local/tomcat/conf/server.xml && catalina.sh run"]
