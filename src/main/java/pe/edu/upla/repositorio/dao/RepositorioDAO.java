@@ -162,11 +162,7 @@ public class RepositorioDAO {
                 lista.add(ent);
             }
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Usando datos en memoria para entregables: " + e.getMessage());
-            return getMemoriaEntregables();
-        }
-
-        if (lista.isEmpty()) {
+            LOGGER.log(Level.WARNING, "Conexión a BD falló, usando datos en memoria: " + e.getMessage());
             return getMemoriaEntregables();
         }
 
