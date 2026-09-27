@@ -222,12 +222,13 @@
                                         </td>
                                         <td style="text-align: right;">
                                             <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
+                                                <c:set var="fullUrl" value="${e.archivoUrl.startsWith('http://') || e.archivoUrl.startsWith('https://') || e.archivoUrl.startsWith('/') ? e.archivoUrl : pageContext.request.contextPath.concat('/').concat(e.archivoUrl)}" />
                                                 <!-- BOTÓN VISTA PREVIA EN PANTALLA -->
-                                                <button type="button" class="btn btn-primary btn-sm" onclick="openDocViewer('${e.archivoUrl}', '${e.tituloTrabajo}')">
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="openDocViewer('${fullUrl}', '${e.tituloTrabajo}')">
                                                     👁️ Ver en Pantalla
                                                 </button>
                                                 <!-- BOTÓN DESCARGAR -->
-                                                <a href="${e.archivoUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar archivo">
+                                                <a href="${fullUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar archivo" download>
                                                     ⬇️ Descargar
                                                 </a>
                                                 <!-- BOTÓN ELIMINAR (SI HAY SESIÓN) -->
@@ -416,13 +417,11 @@
         modalTitle.textContent = "📖 Viendo: " + title;
 
         if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-            container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain;">`;
+            container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain; border-radius: 8px;">`;
         } else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
-            container.innerHTML = `<object data="${url}" type="application/pdf" width="100%" height="520px">
-                <iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>
-            </object>`;
+            container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
         } else {
-            container.innerHTML = `<iframe src="https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true" width="100%" height="520px"></iframe>`;
+            container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
         }
 
         modal.classList.add("active");

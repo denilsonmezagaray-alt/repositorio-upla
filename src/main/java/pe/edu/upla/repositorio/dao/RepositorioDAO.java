@@ -55,31 +55,44 @@ public class RepositorioDAO {
                 "Frameworks Modernos y Despliegue en Cloud"
             };
 
-            // Trabajo de demostración 1
+            // Trabajo Semana 1
             Entregable e1 = new Entregable();
             e1.setId(1);
             e1.setSemana(1);
             e1.setUnidadId(1);
             e1.setUnidadNumero(1);
             e1.setNombreUnidad(nombresUnidad[0]);
-            e1.setTituloTrabajo("Informe de Introducción a la Arquitectura");
-            e1.setNombreArchivo("Semana_01_Patrones_Arquitectonicos_Alessander.pdf");
-            e1.setArchivoUrl("https://upla.edu.pe/repositorio/docs/Semana_01_Patrones.pdf");
+            e1.setTituloTrabajo("Trabajo Semana 1 - Arquitectura de Software: Fundamentos y Elementos");
+            e1.setNombreArchivo("Semana_01_Arquitectura_de_Software_Alessander.pdf");
+            e1.setArchivoUrl("docs/Semana_01_Arquitectura_de_Software_Alessander.pdf");
             e1.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e1);
 
-            // Trabajo de demostración 2
+            // Trabajo Semana 2
             Entregable e2 = new Entregable();
             e2.setId(2);
             e2.setSemana(2);
             e2.setUnidadId(1);
             e2.setUnidadNumero(1);
             e2.setNombreUnidad(nombresUnidad[0]);
-            e2.setTituloTrabajo("Diagrama MVC y Caso de Estudio UPLA");
-            e2.setNombreArchivo("Semana_02_Diagrama_MVC_UPLA.png");
-            e2.setArchivoUrl("https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&auto=format&fit=crop&q=80");
+            e2.setTituloTrabajo("Trabajo Semana 2 - Estándares Internacionales en Arquitectura de Software");
+            e2.setNombreArchivo("Semana_02_Estandares_Internacionales_Alessander.pdf");
+            e2.setArchivoUrl("docs/Semana_02_Estandares_Internacionales_Alessander.pdf");
             e2.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e2);
+
+            // Trabajo Semana 3
+            Entregable e3 = new Entregable();
+            e3.setId(3);
+            e3.setSemana(3);
+            e3.setUnidadId(1);
+            e3.setUnidadNumero(1);
+            e3.setNombreUnidad(nombresUnidad[0]);
+            e3.setTituloTrabajo("Trabajo Semana 3 - Estilos y Patrones Arquitectónicos de Software");
+            e3.setNombreArchivo("Semana_03_Estilos_y_Patrones_Arquitectonicos_Alessander.jpg");
+            e3.setArchivoUrl("img/Semana_03_Estilos_y_Patrones_Arquitectonicos_Alessander.jpg");
+            e3.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e3);
         }
         return MEMORIA_ENTREGABLES;
     }
@@ -138,10 +151,11 @@ public class RepositorioDAO {
 
     public List<Entregable> obtenerEntregables() {
         List<Entregable> lista = new ArrayList<>();
-        String sql = "SELECT e.id, e.semana, e.unidad_id, u.numero AS unidad_numero, u.nombre AS nombre_unidad, " +
+        String sql = "SELECT e.id, e.semana, e.unidad_id, COALESCE(u.numero, ((e.semana - 1) / 4) + 1) AS unidad_numero, " +
+                     "COALESCE(u.nombre, 'Fundamentos de Arquitectura') AS nombre_unidad, " +
                      "e.titulo_trabajo, e.nombre_archivo, e.archivo_url, e.fecha_subida " +
                      "FROM entregables e " +
-                     "INNER JOIN unidades u ON e.unidad_id = u.id " +
+                     "LEFT JOIN unidades u ON e.unidad_id = u.id " +
                      "ORDER BY e.semana ASC, e.id ASC";
 
         try (Connection con = ConexionDB.getConexion();
@@ -175,20 +189,23 @@ public class RepositorioDAO {
     public boolean guardarEntregable(int semana, String tituloTrabajo, String nombreArchivo, String archivoUrl) {
         int unidadNum = ((semana - 1) / 4) + 1;
         String sql = "INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url, fecha_subida) " +
-                     "VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
+                     "VALUES (?, COALESCE((SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?), ?, ?, ?, CURRENT_TIMESTAMP)";
         
+        boolean ok = false;
         try (Connection con = ConexionDB.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, semana);
             ps.setInt(2, unidadNum);
-            ps.setString(3, tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
-            ps.setString(4, nombreArchivo);
-            ps.setString(5, archivoUrl);
+            ps.setInt(3, unidadNum);
+            ps.setString(4, tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
+            ps.setString(5, nombreArchivo);
+            ps.setString(6, archivoUrl);
 
-            ps.executeUpdate();
+            int filas = ps.executeUpdate();
+            ok = filas > 0;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error al guardar entregable en BD: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error al guardar entregable en BD: " + e.getMessage(), e);
         }
 
         // Sincronizar en memoria compartida (Soporta múltiples entregables)
@@ -211,7 +228,7 @@ public class RepositorioDAO {
         nuevo.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
 
         getMemoriaEntregables().add(nuevo);
-        return true;
+        return ok;
     }
 
     /**
