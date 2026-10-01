@@ -93,6 +93,19 @@ public class RepositorioDAO {
             e3.setArchivoUrl("img/Semana_03_Estilos_y_Patrones_Arquitectonicos_Alessander.jpg");
             e3.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e3);
+
+            // Trabajo Semana 4
+            Entregable e4 = new Entregable();
+            e4.setId(4);
+            e4.setSemana(4);
+            e4.setUnidadId(1);
+            e4.setUnidadNumero(1);
+            e4.setNombreUnidad(nombresUnidad[0]);
+            e4.setTituloTrabajo("Trabajo Semana 4 - Arquitectura de Software: Estándares ISO 42010, ISO 25010, Modelos C4 y 4+1");
+            e4.setNombreArchivo("Semana_04_Arquitectura_de_Software_Alessander.pdf");
+            e4.setArchivoUrl("docs/Semana_04_Arquitectura_de_Software_Alessander.pdf");
+            e4.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e4);
         }
         return MEMORIA_ENTREGABLES;
     }
