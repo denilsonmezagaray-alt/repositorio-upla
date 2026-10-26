@@ -106,6 +106,32 @@ public class RepositorioDAO {
             e4.setArchivoUrl("docs/Semana_04_Arquitectura_de_Software_Alessander.pdf");
             e4.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e4);
+
+            // Trabajo Semana 6
+            Entregable e6 = new Entregable();
+            e6.setId(6);
+            e6.setSemana(6);
+            e6.setUnidadId(2);
+            e6.setUnidadNumero(2);
+            e6.setNombreUnidad(nombresUnidad[1]);
+            e6.setTituloTrabajo("Trabajo Semana 6 - Infografía: Requisitos Funcionales y No Funcionales por Rol (LMS Pequeños Exploradores)");
+            e6.setNombreArchivo("Semana_06_Infografia_Requisitos_LMS_Alessander.jpg");
+            e6.setArchivoUrl("img/Semana_06_Infografia_Requisitos_LMS_Alessander.jpg");
+            e6.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e6);
+
+            // Trabajo Semana 7
+            Entregable e7 = new Entregable();
+            e7.setId(7);
+            e7.setSemana(7);
+            e7.setUnidadId(2);
+            e7.setUnidadNumero(2);
+            e7.setNombreUnidad(nombresUnidad[1]);
+            e7.setTituloTrabajo("Trabajo Semana 7 - Infografía: Diagrama Causal de la Problemática Educativa");
+            e7.setNombreArchivo("Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
+            e7.setArchivoUrl("img/Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
+            e7.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e7);
         }
         return MEMORIA_ENTREGABLES;
     }
