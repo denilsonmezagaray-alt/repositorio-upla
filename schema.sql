@@ -44,12 +44,13 @@ INSERT INTO unidades (numero, nombre, descripcion) VALUES
 (3, 'Comunicación, Integración y Servicios Web REST', 'Protocolos de Integración, REST APIs y JSON/XML'),
 (4, 'Frameworks Modernos y Despliegue en Cloud', 'Patrón Java EE MVC, Tomcat 9, Docker y Render');
 
--- Datos Semilla Iniciales de Trabajos (Semanas 1, 2, 3, 4, 6, 7 y 8)
+-- Datos Semilla Iniciales de Trabajos (Semanas 1, 2, 3, 4, 5, 6, 7 y 8)
 INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url) VALUES 
 (1, 1, 'Trabajo Semana 1 - Arquitectura de Software: Fundamentos y Elementos', 'Semana_01_Arquitectura_de_Software_Alessander.pdf', 'docs/Semana_01_Arquitectura_de_Software_Alessander.pdf'),
 (2, 1, 'Trabajo Semana 2 - Estándares Internacionales en Arquitectura de Software', 'Semana_02_Estandares_Internacionales_Alessander.pdf', 'docs/Semana_02_Estandares_Internacionales_Alessander.pdf'),
 (3, 1, 'Trabajo Semana 3 - Estilos y Patrones Arquitectónicos de Software', 'Semana_03_Estilos_y_Patrones_Arquitectonicos_Alessander.jpg', 'img/Semana_03_Estilos_y_Patrones_Arquitectonicos_Alessander.jpg'),
 (4, 1, 'Trabajo Semana 4 - Arquitectura de Software: Estándares ISO 42010, ISO 25010, Modelos C4 y 4+1', 'Semana_04_Arquitectura_de_Software_Alessander.pdf', 'docs/Semana_04_Arquitectura_de_Software_Alessander.pdf'),
+(5, 2, 'Trabajo Semana 5 - Informe de Diseño Arquitectónico y Modelado UML (Pequeños Exploradores LMS)', 'Semana_05_Informe_Pequenos_Exploradores_LMS.pdf', 'docs/Semana_05_Informe_Pequenos_Exploradores_LMS.pdf'),
 (6, 2, 'Trabajo Semana 6 - Infografía: Requisitos Funcionales y No Funcionales por Rol (LMS Pequeños Exploradores)', 'Semana_06_Infografia_Requisitos_LMS_Alessander.jpg', 'img/Semana_06_Infografia_Requisitos_LMS_Alessander.jpg'),
 (7, 2, 'Trabajo Semana 7 - Diseño Físico de Base de Datos para Microsoft Azure SQL Database', 'Semana_07_Diseno_Fisico_Base_Datos_Azure.pdf', 'docs/Semana_07_Diseno_Fisico_Base_Datos_Azure.pdf'),
 (7, 2, 'Trabajo Semana 7 - Script T-SQL DDL/DML Azure SQL (Pequenos_Exploradores_AzureSQL.sql)', 'Semana_07_Pequenos_Exploradores_AzureSQL.sql', 'docs/Semana_07_Pequenos_Exploradores_AzureSQL.sql'),

@@ -107,6 +107,19 @@ public class RepositorioDAO {
             e4.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e4);
 
+            // Trabajo Semana 5
+            Entregable e5 = new Entregable();
+            e5.setId(5);
+            e5.setSemana(5);
+            e5.setUnidadId(2);
+            e5.setUnidadNumero(2);
+            e5.setNombreUnidad(nombresUnidad[1]);
+            e5.setTituloTrabajo("Trabajo Semana 5 - Informe de Diseño Arquitectónico y Modelado UML (Pequeños Exploradores LMS)");
+            e5.setNombreArchivo("Semana_05_Informe_Pequenos_Exploradores_LMS.pdf");
+            e5.setArchivoUrl("docs/Semana_05_Informe_Pequenos_Exploradores_LMS.pdf");
+            e5.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e5);
+
             // Trabajo Semana 6
             Entregable e6 = new Entregable();
             e6.setId(6);
