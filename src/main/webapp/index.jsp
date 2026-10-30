@@ -231,6 +231,12 @@
                                                 <a href="${fullUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar archivo" download>
                                                     ⬇️ Descargar
                                                 </a>
+                                                <!-- BOTÓN PROTOTIPO FIGMA (SI ES SEMANA 8 O FIGMA) -->
+                                                <c:if test="${e.semana == 8 || e.tituloTrabajo.toLowerCase().contains('figma')}">
+                                                    <a href="https://www.figma.com/design/kpkKx5iSVkcJjIFDCHov37/Sin-t%C3%ADtulo?node-id=2-3&t=NW402MHREiENVPpl-0" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background: linear-gradient(135deg, #a259ff, #f24e1e); color: #fff; font-weight: 700; border: none; text-decoration: none;" title="Abrir prototipo interactivo en Figma">
+                                                        🎨 Prototipo Figma
+                                                    </a>
+                                                </c:if>
                                                 <!-- BOTÓN ELIMINAR (SI HAY SESIÓN) -->
                                                 <c:if test="${not empty sessionScope.usuario}">
                                                     <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Eliminar el trabajo \'${e.tituloTrabajo}\'?');">
@@ -418,6 +424,17 @@
 
         if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
             container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain; border-radius: 8px;">`;
+        } else if (url.match(/\.sql$/i)) {
+            container.innerHTML = `<div style="text-align:center; padding: 2rem; color: #94a3b8;">Cargando script SQL...</div>`;
+            fetch(url)
+                .then(r => r.text())
+                .then(sql => {
+                    const escaped = sql.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    container.innerHTML = `<pre style="max-height: 520px; overflow: auto; background: #0f172a; padding: 1.25rem; border-radius: 8px; color: #38bdf8; font-family: monospace; font-size: 0.85rem; line-height: 1.5; text-align: left; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap; word-break: break-all;"><code>` + escaped + `</code></pre>`;
+                })
+                .catch(err => {
+                    container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
+                });
         } else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
             container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
         } else {

@@ -33,8 +33,8 @@ public class RepositorioDAO {
         "Semana 04: Documentación y Representación Arquitectónica (Modelos 4+1 Vistas)",
         "Semana 05: Principios de Programación Orientada a Objetos aplicados a la Arquitectura",
         "Semana 06: Modelado Arquitectónico con UML (Casos de Uso, Clases y Paquetes)",
-        "Semana 07: Diseño de Componentes, Cohesión, Acoplamiento y Capas de la Arquitectura",
-        "Semana 08: Elaboración y Validación del Modelo Arquitectónico Integral",
+        "Semana 07: Diseño físico de la base de datos de la aplicación en un repositorio (Ejemplo: Ms. Azure)",
+        "Semana 08: Diseño del front-end utilizando una herramienta (Ejemplo: Figma)",
         "Semana 09: Fundamentos de la Comunicación entre Arquitecturas de Software",
         "Semana 10: Métodos y Tecnologías para Integración de Sistemas (APIs RESTful)",
         "Semana 11: Diseño de Interfaces de Comunicación y Transmisión de Datos (JSON/XML)",
@@ -120,18 +120,57 @@ public class RepositorioDAO {
             e6.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e6);
 
-            // Trabajo Semana 7
+            // Trabajo Semana 7 (Principal) - Diseño Físico de Base de Datos para Microsoft Azure SQL Database
             Entregable e7 = new Entregable();
             e7.setId(7);
             e7.setSemana(7);
             e7.setUnidadId(2);
             e7.setUnidadNumero(2);
             e7.setNombreUnidad(nombresUnidad[1]);
-            e7.setTituloTrabajo("Trabajo Semana 7 - Infografía: Diagrama Causal de la Problemática Educativa");
-            e7.setNombreArchivo("Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
-            e7.setArchivoUrl("img/Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
+            e7.setTituloTrabajo("Trabajo Semana 7 - Diseño Físico de Base de Datos para Microsoft Azure SQL Database");
+            e7.setNombreArchivo("Semana_07_Diseno_Fisico_Base_Datos_Azure.pdf");
+            e7.setArchivoUrl("docs/Semana_07_Diseno_Fisico_Base_Datos_Azure.pdf");
             e7.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
             MEMORIA_ENTREGABLES.add(e7);
+
+            // Trabajo Semana 7 (Anexo Técnico) - Script T-SQL DDL/DML Azure SQL
+            Entregable e7sql = new Entregable();
+            e7sql.setId(8);
+            e7sql.setSemana(7);
+            e7sql.setUnidadId(2);
+            e7sql.setUnidadNumero(2);
+            e7sql.setNombreUnidad(nombresUnidad[1]);
+            e7sql.setTituloTrabajo("Trabajo Semana 7 - Script T-SQL DDL/DML Azure SQL (Pequenos_Exploradores_AzureSQL.sql)");
+            e7sql.setNombreArchivo("Semana_07_Pequenos_Exploradores_AzureSQL.sql");
+            e7sql.setArchivoUrl("docs/Semana_07_Pequenos_Exploradores_AzureSQL.sql");
+            e7sql.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e7sql);
+
+            // Trabajo Semana 7 (Complementario) - Infografía Diagrama Causal
+            Entregable e7info = new Entregable();
+            e7info.setId(9);
+            e7info.setSemana(7);
+            e7info.setUnidadId(2);
+            e7info.setUnidadNumero(2);
+            e7info.setNombreUnidad(nombresUnidad[1]);
+            e7info.setTituloTrabajo("Trabajo Semana 7 - Infografía: Diagrama Causal de la Problemática Educativa");
+            e7info.setNombreArchivo("Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
+            e7info.setArchivoUrl("img/Semana_07_Infografia_Diagrama_Causal_Alessander.jpg");
+            e7info.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e7info);
+
+            // Trabajo Semana 8 - Diseño del Front-end de la Aplicación mediante Figma
+            Entregable e8 = new Entregable();
+            e8.setId(10);
+            e8.setSemana(8);
+            e8.setUnidadId(2);
+            e8.setUnidadNumero(2);
+            e8.setNombreUnidad(nombresUnidad[1]);
+            e8.setTituloTrabajo("Trabajo Semana 8 - Diseño del Front-end de la Aplicación mediante Figma (Pequeños Exploradores LMS)");
+            e8.setNombreArchivo("Semana_08_Diseno_Frontend_Figma.pdf");
+            e8.setArchivoUrl("docs/Semana_08_Diseno_Frontend_Figma.pdf");
+            e8.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
+            MEMORIA_ENTREGABLES.add(e8);
         }
         return MEMORIA_ENTREGABLES;
     }
