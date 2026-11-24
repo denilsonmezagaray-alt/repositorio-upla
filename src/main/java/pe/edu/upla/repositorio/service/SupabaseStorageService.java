@@ -29,54 +29,72 @@ public class SupabaseStorageService {
      */
     public static String uploadFile(String bucketName, String originalFilename, InputStream inputStream, String contentType) {
         try {
-            // Sanitizar y generar un nombre único
+            byte[] fileBytes = readAllBytes(inputStream);
+            return uploadBytes(bucketName, originalFilename, fileBytes, contentType);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Excepción al procesar subida a Supabase Storage: " + e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * Lee todos los bytes de un InputStream de forma segura en Java 11.
+     */
+    public static byte[] readAllBytes(InputStream inputStream) throws java.io.IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        int nRead;
+        byte[] data = new byte[8192];
+        while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+        buffer.flush();
+        return buffer.toByteArray();
+    }
+
+    /**
+     * Sube un arreglo de bytes a Supabase Storage.
+     * Retorna la URL pública real si tiene éxito, o null si no está configurado o falla.
+     */
+    public static String uploadBytes(String bucketName, String originalFilename, byte[] fileBytes, String contentType) {
+        try {
+            if (!SUPABASE_URL.startsWith("http")
+                    || SUPABASE_SERVICE_KEY == null
+                    || SUPABASE_SERVICE_KEY.trim().isEmpty()
+                    || SUPABASE_SERVICE_KEY.contains("YOUR_SUPABASE_SECRET_KEY")
+                    || SUPABASE_SERVICE_KEY.contains("dummykey")) {
+                LOGGER.info("SUPABASE_KEY no configurada; se omitirá Supabase Storage y se usará almacenamiento en BD.");
+                return null;
+            }
+
             String cleanFileName = originalFilename.replaceAll("[^a-zA-Z0-9\\.\\-_]", "_");
             String fileName = UUID.randomUUID().toString().substring(0, 8) + "_" + cleanFileName;
 
-            // Leer bytes del archivo
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            int nRead;
-            byte[] data = new byte[8192];
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                buffer.write(data, 0, nRead);
-            }
-            buffer.flush();
-            byte[] fileBytes = buffer.toByteArray();
+            String targetUrl = SUPABASE_URL + "/storage/v1/object/" + bucketName + "/" + fileName;
+            URL url = new URL(targetUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setConnectTimeout(10000);
+            conn.setReadTimeout(20000);
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Authorization", "Bearer " + SUPABASE_SERVICE_KEY);
+            conn.setRequestProperty("apiKey", SUPABASE_SERVICE_KEY);
+            conn.setRequestProperty("Content-Type", contentType != null ? contentType : "application/octet-stream");
 
-            // Si las llaves de Supabase están configuradas con valores reales en Render/Servidor:
-            if (SUPABASE_URL.startsWith("http") && !SUPABASE_SERVICE_KEY.contains("dummykey")) {
-                String targetUrl = SUPABASE_URL + "/storage/v1/object/" + bucketName + "/" + fileName;
-                URL url = new URL(targetUrl);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setDoOutput(true);
-                conn.setRequestProperty("Authorization", "Bearer " + SUPABASE_SERVICE_KEY);
-                conn.setRequestProperty("apiKey", SUPABASE_SERVICE_KEY);
-                conn.setRequestProperty("Content-Type", contentType != null ? contentType : "application/octet-stream");
-
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(fileBytes);
-                    os.flush();
-                }
-
-                int responseCode = conn.getResponseCode();
-                if (responseCode == 200 || responseCode == 201) {
-                    return SUPABASE_URL + "/storage/v1/object/public/" + bucketName + "/" + fileName;
-                } else {
-                    LOGGER.warning("Error al subir archivo a Supabase Storage API. Código HTTP: " + responseCode);
-                }
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(fileBytes);
+                os.flush();
             }
 
-            // Fallback elegante / Simulación de URL pública basada en CDN o almacenamiento
-            if ("profiles".equals(bucketName)) {
-                return "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80";
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200 || responseCode == 201) {
+                return SUPABASE_URL + "/storage/v1/object/public/" + bucketName + "/" + fileName;
             } else {
-                return "https://upla.edu.pe/repositorio/docs/" + fileName;
+                LOGGER.warning("Error al subir archivo a Supabase Storage API. Código HTTP: " + responseCode);
+                return null;
             }
-
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Excepción al procesar subida a Supabase Storage: " + e.getMessage(), e);
-            return "https://upla.edu.pe/repositorio/docs/entregable_semana.pdf";
+            LOGGER.log(Level.WARNING, "Excepción al subir a Supabase Storage: " + e.getMessage());
+            return null;
         }
     }
 }

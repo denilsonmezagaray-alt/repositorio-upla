@@ -83,23 +83,18 @@
 
             <!-- FORMULARIO 1: LOGIN -->
             <div id="loginFormSection">
-                <div class="demo-box">
-                    💡 <strong>Credenciales Semilla de Alessander Meza Garay:</strong><br>
-                    Usuario: <code style="color: #fff; font-weight: 700;">alessander</code> &bull; Clave: <code style="color: #fff; font-weight: 700;">upla2026</code>
-                </div>
-
                 <form action="${pageContext.request.contextPath}/auth" method="post">
                     <input type="hidden" name="action" value="login">
                     <div class="form-group">
                         <label class="form-label">Nombre de Usuario:</label>
-                        <input type="text" name="usuario" class="form-control" value="alessander" placeholder="Ej. alessander" required>
+                        <input type="text" name="usuario" class="form-control" placeholder="Ingresa tu usuario" autocomplete="username" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Contraseña:</label>
-                        <input type="password" name="clave" class="form-control" value="upla2026" placeholder="••••••••" required>
+                        <input type="password" name="clave" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
-                        🔐 Ingresar como Administrador (Alessander)
+                        🔐 Ingresar como Administrador
                     </button>
                 </form>
             </div>

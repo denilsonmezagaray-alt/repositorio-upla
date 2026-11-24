@@ -41,6 +41,9 @@ public class ConexionDB {
         if (dbUrl == null || dbUrl.trim().isEmpty()) {
             dbUrl = DEFAULT_URL;
         }
+        if (!dbUrl.contains("connectTimeout")) {
+            dbUrl += (dbUrl.contains("?") ? "&" : "?") + "connectTimeout=10&socketTimeout=25";
+        }
         if (dbUser == null || dbUser.trim().isEmpty()) {
             dbUser = DEFAULT_USER;
         }

@@ -72,14 +72,17 @@ public class UploadServlet extends HttpServlet {
                 String originalFilename = archivoPart.getSubmittedFileName();
                 String contentType = archivoPart.getContentType();
 
-                // Subir archivo al bucket 'assignments' en Supabase Storage
-                String archivoUrl;
+                // Leer bytes del archivo para poder respaldarlo en PostgreSQL y/o Supabase Storage
+                byte[] fileBytes;
                 try (InputStream is = archivoPart.getInputStream()) {
-                    archivoUrl = SupabaseStorageService.uploadFile("assignments", originalFilename, is, contentType);
+                    fileBytes = SupabaseStorageService.readAllBytes(is);
                 }
 
-                // Guardar nuevo registro con Título Personalizado en PostgreSQL/Memoria
-                repositorioDAO.guardarEntregable(semana, tituloTrabajo, originalFilename, archivoUrl);
+                // Intentar subir al bucket 'assignments' en Supabase Storage (retorna null si no está configurado)
+                String archivoUrl = SupabaseStorageService.uploadBytes("assignments", originalFilename, fileBytes, contentType);
+
+                // Guardar registro + contenido binario en PostgreSQL (y memoria como respaldo)
+                repositorioDAO.guardarEntregable(semana, tituloTrabajo, originalFilename, archivoUrl, fileBytes, contentType);
                 response.sendRedirect(request.getContextPath() + "/index?msg=upload_success&week=" + semana);
             } else {
                 response.sendRedirect(request.getContextPath() + "/index?error=no_file_selected");

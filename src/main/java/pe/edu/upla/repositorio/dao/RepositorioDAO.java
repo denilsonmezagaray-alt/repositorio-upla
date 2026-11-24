@@ -240,6 +240,36 @@ public class RepositorioDAO {
         }
     }
 
+    public static class ArchivoData {
+        private final String nombreArchivo;
+        private final String contentType;
+        private final byte[] contenido;
+
+        public ArchivoData(String nombreArchivo, String contentType, byte[] contenido) {
+            this.nombreArchivo = nombreArchivo;
+            this.contentType = contentType;
+            this.contenido = contenido;
+        }
+
+        public String getNombreArchivo() { return nombreArchivo; }
+        public String getContentType() { return contentType; }
+        public byte[] getContenido() { return contenido; }
+    }
+
+    private void asegurarTablaArchivos(Connection con) {
+        String ddl = "CREATE TABLE IF NOT EXISTS entregables_archivos (" +
+                     "entregable_id INTEGER PRIMARY KEY REFERENCES entregables(id) ON DELETE CASCADE, " +
+                     "nombre_archivo TEXT NOT NULL, " +
+                     "content_type TEXT, " +
+                     "contenido BYTEA NOT NULL, " +
+                     "fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+        try (PreparedStatement ps = con.prepareStatement(ddl)) {
+            ps.execute();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "No se pudo asegurar tabla entregables_archivos: " + e.getMessage());
+        }
+    }
+
     public List<Entregable> obtenerEntregables() {
         List<Entregable> lista = new ArrayList<>();
         String sql = "SELECT e.id, e.semana, e.unidad_id, COALESCE(u.numero, ((e.semana - 1) / 4) + 1) AS unidad_numero, " +
@@ -249,57 +279,112 @@ public class RepositorioDAO {
                      "LEFT JOIN unidades u ON e.unidad_id = u.id " +
                      "ORDER BY e.semana ASC, e.id ASC";
 
-        try (Connection con = ConexionDB.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        Exception ultimoError = null;
+        for (int intento = 1; intento <= 2; intento++) {
+            lista.clear();
+            try (Connection con = ConexionDB.getConexion();
+                 PreparedStatement ps = con.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                Entregable ent = new Entregable();
-                ent.setId(rs.getInt("id"));
-                ent.setSemana(rs.getInt("semana"));
-                ent.setUnidadId(rs.getInt("unidad_id"));
-                ent.setUnidadNumero(rs.getInt("unidad_numero"));
-                ent.setNombreUnidad(rs.getString("nombre_unidad"));
-                ent.setTituloTrabajo(rs.getString("titulo_trabajo"));
-                ent.setNombreArchivo(rs.getString("nombre_archivo"));
-                ent.setArchivoUrl(rs.getString("archivo_url"));
-                ent.setFechaSubida(rs.getTimestamp("fecha_subida"));
-                lista.add(ent);
+                while (rs.next()) {
+                    Entregable ent = new Entregable();
+                    ent.setId(rs.getInt("id"));
+                    ent.setSemana(rs.getInt("semana"));
+                    ent.setUnidadId(rs.getInt("unidad_id"));
+                    ent.setUnidadNumero(rs.getInt("unidad_numero"));
+                    ent.setNombreUnidad(rs.getString("nombre_unidad"));
+                    ent.setTituloTrabajo(rs.getString("titulo_trabajo"));
+                    ent.setNombreArchivo(rs.getString("nombre_archivo"));
+                    ent.setArchivoUrl(rs.getString("archivo_url"));
+                    ent.setFechaSubida(rs.getTimestamp("fecha_subida"));
+                    lista.add(ent);
+                }
+                return lista;
+            } catch (Exception e) {
+                ultimoError = e;
+                LOGGER.log(Level.WARNING, "Intento " + intento + " de conexión a BD falló: " + e.getMessage());
+                if (intento == 1) {
+                    try { Thread.sleep(600); } catch (InterruptedException ignored) {}
+                }
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Conexión a BD falló, usando datos en memoria: " + e.getMessage());
-            return getMemoriaEntregables();
         }
 
-        return lista;
+        LOGGER.log(Level.WARNING, "Conexión a BD falló tras reintentos, usando datos en memoria: " +
+                (ultimoError != null ? ultimoError.getMessage() : "desconocido"));
+        return getMemoriaEntregables();
     }
 
     /**
      * Permite subir MÚLTIPLES archivos por semana con su TÍTULO PERSONALIZADO.
      */
     public boolean guardarEntregable(int semana, String tituloTrabajo, String nombreArchivo, String archivoUrl) {
+        return guardarEntregable(semana, tituloTrabajo, nombreArchivo, archivoUrl, null, null);
+    }
+
+    /**
+     * Guarda el entregable en PostgreSQL y también persiste el binario en entregables_archivos
+     * para que nunca se pierda al reiniciar o redesplegar Render.
+     */
+    public boolean guardarEntregable(int semana, String tituloTrabajo, String nombreArchivo, String archivoUrl,
+                                     byte[] contenidoArchivo, String contentType) {
         int unidadNum = ((semana - 1) / 4) + 1;
+        String tituloFinal = (tituloTrabajo != null && !tituloTrabajo.trim().isEmpty()) ? tituloTrabajo : nombreArchivo;
+        String urlInicial = (archivoUrl != null && !archivoUrl.trim().isEmpty()) ? archivoUrl : "archivo?id=0";
+
         String sql = "INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url, fecha_subida) " +
-                     "VALUES (?, COALESCE((SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?), ?, ?, ?, CURRENT_TIMESTAMP)";
-        
+                     "VALUES (?, COALESCE((SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?), ?, ?, ?, CURRENT_TIMESTAMP) RETURNING id";
+
         boolean ok = false;
-        try (Connection con = ConexionDB.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        int generatedId = -1;
+        try (Connection con = ConexionDB.getConexion()) {
+            asegurarTablaArchivos(con);
 
-            ps.setInt(1, semana);
-            ps.setInt(2, unidadNum);
-            ps.setInt(3, unidadNum);
-            ps.setString(4, tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
-            ps.setString(5, nombreArchivo);
-            ps.setString(6, archivoUrl);
+            try (PreparedStatement ps = con.prepareStatement(sql)) {
+                ps.setInt(1, semana);
+                ps.setInt(2, unidadNum);
+                ps.setInt(3, unidadNum);
+                ps.setString(4, tituloFinal);
+                ps.setString(5, nombreArchivo);
+                ps.setString(6, urlInicial);
 
-            int filas = ps.executeUpdate();
-            ok = filas > 0;
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        generatedId = rs.getInt(1);
+                        ok = true;
+                    }
+                }
+            }
+
+            if (ok && generatedId > 0) {
+                if (contenidoArchivo != null && contenidoArchivo.length > 0) {
+                    String sqlArchivo = "INSERT INTO entregables_archivos (entregable_id, nombre_archivo, content_type, contenido) " +
+                                        "VALUES (?, ?, ?, ?) " +
+                                        "ON CONFLICT (entregable_id) DO UPDATE SET nombre_archivo = EXCLUDED.nombre_archivo, " +
+                                        "content_type = EXCLUDED.content_type, contenido = EXCLUDED.contenido";
+                    try (PreparedStatement psArch = con.prepareStatement(sqlArchivo)) {
+                        psArch.setInt(1, generatedId);
+                        psArch.setString(2, nombreArchivo);
+                        psArch.setString(3, contentType != null ? contentType : "application/octet-stream");
+                        psArch.setBytes(4, contenidoArchivo);
+                        psArch.executeUpdate();
+                    }
+                }
+
+                // Si no había URL pública de Supabase Storage, apuntar al servlet local respaldado por PostgreSQL
+                if (archivoUrl == null || archivoUrl.trim().isEmpty()) {
+                    urlInicial = "archivo?id=" + generatedId;
+                    try (PreparedStatement psUpd = con.prepareStatement("UPDATE entregables SET archivo_url = ? WHERE id = ?")) {
+                        psUpd.setString(1, urlInicial);
+                        psUpd.setInt(2, generatedId);
+                        psUpd.executeUpdate();
+                    }
+                }
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al guardar entregable en BD: " + e.getMessage(), e);
         }
 
-        // Sincronizar en memoria compartida (Soporta múltiples entregables)
+        // Sincronizar en memoria compartida (respaldo si BD no responde)
         String[] nombresUnidad = {
             "Fundamentos y Estándares de Arquitectura",
             "Modelado de Arquitecturas con POO y Vistas 4+1",
@@ -308,18 +393,38 @@ public class RepositorioDAO {
         };
 
         Entregable nuevo = new Entregable();
-        nuevo.setId(AUTO_ID.incrementAndGet());
+        nuevo.setId(generatedId > 0 ? generatedId : AUTO_ID.incrementAndGet());
         nuevo.setSemana(semana);
         nuevo.setUnidadId(unidadNum);
         nuevo.setUnidadNumero(unidadNum);
         nuevo.setNombreUnidad(nombresUnidad[unidadNum - 1]);
-        nuevo.setTituloTrabajo(tituloTrabajo != null && !tituloTrabajo.trim().isEmpty() ? tituloTrabajo : nombreArchivo);
+        nuevo.setTituloTrabajo(tituloFinal);
         nuevo.setNombreArchivo(nombreArchivo);
-        nuevo.setArchivoUrl(archivoUrl);
+        nuevo.setArchivoUrl(urlInicial);
         nuevo.setFechaSubida(new java.sql.Timestamp(System.currentTimeMillis()));
 
         getMemoriaEntregables().add(nuevo);
         return ok;
+    }
+
+    public ArchivoData obtenerArchivoPorId(int entregableId) {
+        String sql = "SELECT nombre_archivo, content_type, contenido FROM entregables_archivos WHERE entregable_id = ?";
+        try (Connection con = ConexionDB.getConexion();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, entregableId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new ArchivoData(
+                            rs.getString("nombre_archivo"),
+                            rs.getString("content_type"),
+                            rs.getBytes("contenido")
+                    );
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error al obtener archivo de BD (id=" + entregableId + "): " + e.getMessage());
+        }
+        return null;
     }
 
     /**
@@ -349,14 +454,14 @@ public class RepositorioDAO {
         unidades.add(new Unidad(4, 4, "Frameworks Modernos y Despliegue en Cloud", "Patrón Java EE MVC, Tomcat 9, Docker y Render"));
 
         for (Unidad u : unidades) {
-            int completadas = 0;
+            java.util.Set<Integer> semanasUnicas = new java.util.HashSet<>();
             for (Entregable e : entregables) {
                 if (e.getUnidadNumero() == u.getNumero() && e.isCompletado()) {
-                    completadas++;
+                    semanasUnicas.add(e.getSemana());
                 }
             }
             u.setTotalSemanas(4);
-            u.setSemanasCompletadas(completadas);
+            u.setSemanasCompletadas(semanasUnicas.size());
         }
         return unidades;
     }

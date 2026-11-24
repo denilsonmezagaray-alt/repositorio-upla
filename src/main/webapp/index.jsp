@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ page import="pe.edu.upla.repositorio.dao.RepositorioDAO" %>
 <!--
   =============================================================================
@@ -18,30 +19,6 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        function openTab(tabId) {
-            console.log("Cambiando a pestaña:", tabId);
-            var panes = document.getElementsByClassName("tab-pane");
-            for (var i = 0; i < panes.length; i++) {
-                panes[i].style.display = "none";
-            }
-            var buttons = document.getElementsByClassName("tab-link");
-            for (var j = 0; j < buttons.length; j++) {
-                buttons[j].classList.remove("active");
-            }
-            var target = document.getElementById(tabId);
-            if (target) {
-                target.style.display = "block";
-            }
-            var activeBtn = document.querySelector('.tab-link[data-tab="' + tabId + '"]');
-            if (activeBtn) {
-                activeBtn.classList.add("active");
-            }
-            if (tabId === 'sec-metricas' && typeof renderChart === 'function') {
-                setTimeout(renderChart, 50);
-            }
-        }
-    </script>
 </head>
 <body>
 
@@ -89,6 +66,35 @@
             ⚙️ ${not empty sessionScope.usuario ? 'Subir Nuevo Trabajo' : 'Información del Sistema'}
         </button>
     </nav>
+
+    <!-- ALERTAS DINÁMICAS DE ESTADO -->
+    <c:if test="${not empty param.msg}">
+        <div id="statusAlert" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
+            <span>
+                <c:choose>
+                    <c:when test="${param.msg == 'upload_success'}">✅ Trabajo guardado correctamente en el repositorio (Semana ${param.week}).</c:when>
+                    <c:when test="${param.msg == 'delete_success'}">🗑️ El entregable fue eliminado correctamente.</c:when>
+                    <c:when test="${param.msg == 'login_success'}">🔐 Sesión iniciada correctamente. Ya puedes subir o administrar trabajos.</c:when>
+                    <c:when test="${param.msg == 'logged_out'}">👋 Sesión cerrada correctamente.</c:when>
+                    <c:otherwise>✅ Operación completada correctamente.</c:otherwise>
+                </c:choose>
+            </span>
+            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #34d399; cursor: pointer; font-size: 1rem;">✕</button>
+        </div>
+    </c:if>
+    <c:if test="${not empty param.error}">
+        <div id="errorAlert" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
+            <span>
+                <c:choose>
+                    <c:when test="${param.error == 'upload_failed'}">⚠️ No se pudo subir el archivo. Verifica el tamaño o intenta nuevamente.</c:when>
+                    <c:when test="${param.error == 'no_file_selected'}">⚠️ Debes seleccionar un archivo antes de subir.</c:when>
+                    <c:when test="${param.error == 'delete_failed'}">⚠️ No se pudo eliminar el entregable.</c:when>
+                    <c:otherwise>⚠️ Ocurrió un error al procesar la solicitud.</c:otherwise>
+                </c:choose>
+            </span>
+            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #f87171; cursor: pointer; font-size: 1rem;">✕</button>
+        </div>
+    </c:if>
 
     <!-- PESTAÑA 1: INICIO & PERFIL DE ALESSANDER MEZA GARAY -->
     <div id="sec-inicio" class="tab-pane" style="display: block;">
@@ -169,7 +175,7 @@
                             </div>
                             <div style="display: flex; justify-content: space-between; font-size: 0.775rem; color: var(--text-accent); font-weight: 700;">
                                 <span>Progreso: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
-                                <span>${u.semanasCompletadas} Archivos Subidos</span>
+                                <span>${u.semanasCompletadas} / 4 Semanas</span>
                             </div>
                         </div>
                     </div>
@@ -179,102 +185,161 @@
 
         <!-- TABLA CON SOPORTE PARA MÚLTIPLES TRABAJOS Y VISOR EN PANTALLA -->
         <div class="card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;">
                 <div>
                     <h2 style="font-size: 1.1rem; font-weight: 800;">Lista de Trabajos y Entregables por Semana</h2>
                     <p style="font-size: 0.8rem; color: var(--text-secondary);">Puedes subir más de 1 trabajo por semana y verlos directamente en pantalla</p>
                 </div>
-                <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
-                    ➕ Subir Nuevo Trabajo
-                </button>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
+                    <input type="text" id="searchEntregables" class="form-control" placeholder="🔍 Buscar trabajo o archivo..." oninput="filterEntregables()" style="width: 230px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                    <select id="filterEstado" class="form-control" onchange="filterEntregables()" style="width: 170px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                        <option value="all">Todas las semanas</option>
+                        <option value="done">Solo disponibles</option>
+                        <option value="pending">Sin entregables</option>
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
+                        ➕ Subir Nuevo Trabajo
+                    </button>
+                </div>
             </div>
 
-            <div class="table-container">
-                <table class="clean-table">
-                    <thead>
-                        <tr>
-                            <th>Semana</th>
-                            <th>Tema del Sílabo</th>
-                            <th>Título del Trabajo / Archivo</th>
-                            <th>Estado</th>
-                            <th style="text-align: right;">Acciones de Visualización</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <c:forEach var="semIndex" begin="1" end="16">
-                            <c:set var="tieneArchivos" value="false" />
-                            <c:forEach var="e" items="${entregables}">
-                                <c:if test="${e.semana == semIndex}">
-                                    <c:set var="tieneArchivos" value="true" />
-                                    <tr>
-                                        <td>
-                                            <strong style="color: var(--text-accent);">Semana ${e.semana}</strong>
-                                        </td>
-                                        <td>
-                                            <span style="font-size: 0.85rem; font-weight: 600;">${RepositorioDAO.getTemaSemana(e.semana)}</span>
-                                        </td>
-                                        <td>
-                                            <div style="font-weight: 700; color: #ffffff;">📌 ${e.tituloTrabajo}</div>
-                                            <div style="font-size: 0.775rem; color: var(--text-secondary);">📄 ${e.nombreArchivo}</div>
-                                        </td>
-                                        <td>
-                                            <span class="status-pill status-ok">✓ Disponible</span>
-                                        </td>
-                                        <td style="text-align: right;">
-                                            <div style="display: flex; gap: 0.4rem; justify-content: flex-end;">
-                                                <c:set var="fullUrl" value="${e.archivoUrl.startsWith('http://') || e.archivoUrl.startsWith('https://') || e.archivoUrl.startsWith('/') ? e.archivoUrl : pageContext.request.contextPath.concat('/').concat(e.archivoUrl)}" />
-                                                <!-- BOTÓN VISTA PREVIA EN PANTALLA -->
-                                                <button type="button" class="btn btn-primary btn-sm" onclick="openDocViewer('${fullUrl}', '${e.tituloTrabajo}')">
-                                                    👁️ Ver en Pantalla
-                                                </button>
-                                                <!-- BOTÓN DESCARGAR -->
-                                                <a href="${fullUrl}" target="_blank" class="btn btn-secondary btn-sm" title="Descargar archivo" download>
-                                                    ⬇️ Descargar
-                                                </a>
-                                                <!-- BOTÓN PROTOTIPO FIGMA (SI ES SEMANA 8 O FIGMA) -->
-                                                <c:if test="${e.semana == 8 || e.tituloTrabajo.toLowerCase().contains('figma')}">
-                                                    <a href="https://www.figma.com/design/kpkKx5iSVkcJjIFDCHov37/Sin-t%C3%ADtulo?node-id=2-3&t=NW402MHREiENVPpl-0" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="background: linear-gradient(135deg, #a259ff, #f24e1e); color: #fff; font-weight: 700; border: none; text-decoration: none;" title="Abrir prototipo interactivo en Figma">
-                                                        🎨 Prototipo Figma
+            <div class="weeks-stack" id="weeksStack">
+                <c:forEach var="semIndex" begin="1" end="16">
+                    <c:set var="tieneArchivos" value="false" />
+                    <c:set var="countSemana" value="0" />
+                    <c:set var="fechaSemana" value="" />
+                    <c:forEach var="e" items="${entregables}">
+                        <c:if test="${e.semana == semIndex}">
+                            <c:set var="tieneArchivos" value="true" />
+                            <c:set var="countSemana" value="${countSemana + 1}" />
+                            <c:if test="${empty fechaSemana && not empty e.fechaSubida}">
+                                <c:set var="fechaSemana" value="${e.fechaSubida}" />
+                            </c:if>
+                        </c:if>
+                    </c:forEach>
+
+                    <div class="week-hud-card" data-status="${tieneArchivos ? 'done' : 'pending'}">
+                        <div class="week-hud-header">
+                            <div>
+                                <div class="week-hud-title">Semana ${semIndex}</div>
+                                <div class="week-hud-meta">
+                                    <span>📅</span>
+                                    <c:choose>
+                                        <c:when test="${not empty fechaSemana}">
+                                            <span><fmt:formatDate value="${fechaSemana}" pattern="yyyy-MM-dd" /></span>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <span>2026-I &bull; Pendiente</span>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    <span>&bull;</span>
+                                    <span>${countSemana} ${countSemana == 1 ? 'archivo' : 'archivos'}</span>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
+                                ➕ Agregar Trabajo
+                            </button>
+                        </div>
+
+                        <p class="week-hud-desc">${RepositorioDAO.getTemaSemana(semIndex)}</p>
+
+                        <c:choose>
+                            <c:when test="${tieneArchivos}">
+                                <div class="attachments-label">
+                                    <span>📎</span>
+                                    <span>ARCHIVOS ADJUNTOS</span>
+                                </div>
+
+                                <div class="attachments-grid">
+                                    <c:forEach var="e" items="${entregables}">
+                                        <c:if test="${e.semana == semIndex}">
+                                            <c:set var="fullUrl" value="${e.archivoUrl.startsWith('http://') || e.archivoUrl.startsWith('https://') || e.archivoUrl.startsWith('/') ? e.archivoUrl : pageContext.request.contextPath.concat('/').concat(e.archivoUrl)}" />
+                                            <c:set var="downloadUrl" value="${fn:contains(fullUrl, 'archivo?id=') ? fullUrl.concat('&download=1') : fullUrl}" />
+                                            <c:set var="lowerName" value="${fn:toLowerCase(e.nombreArchivo)}" />
+                                            <c:set var="isImage" value="${fn:endsWith(lowerName, '.jpg') || fn:endsWith(lowerName, '.jpeg') || fn:endsWith(lowerName, '.png') || fn:endsWith(lowerName, '.gif') || fn:endsWith(lowerName, '.webp')}" />
+                                            <c:set var="isPdf" value="${fn:endsWith(lowerName, '.pdf')}" />
+                                            <c:set var="isSql" value="${fn:endsWith(lowerName, '.sql')}" />
+
+                                            <div class="attachment-card">
+                                                <!-- MINIATURA / VISTA PREVIA -->
+                                                <div class="attachment-thumb"
+                                                     data-url="${fn:escapeXml(fullUrl)}"
+                                                     data-title="${fn:escapeXml(e.tituloTrabajo)}"
+                                                     data-filename="${fn:escapeXml(e.nombreArchivo)}"
+                                                     onclick="openDocViewerFromBtn(this)">
+                                                    <c:choose>
+                                                        <c:when test="${isImage}">
+                                                            <img src="${fn:escapeXml(fullUrl)}" alt="${fn:escapeXml(e.tituloTrabajo)}" loading="lazy">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="attachment-thumb-doc">
+                                                                <span class="doc-badge ${isPdf ? 'pdf' : (isSql ? 'sql' : '')}">
+                                                                    ${isPdf ? 'PDF' : (isSql ? 'SQL' : 'ARCHIVO')}
+                                                                </span>
+                                                                <span class="doc-filename">${fn:escapeXml(e.nombreArchivo)}</span>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+
+                                                <!-- TÍTULO DEL TRABAJO -->
+                                                <div class="attachment-title" title="${fn:escapeXml(e.tituloTrabajo)}">
+                                                    ${fn:escapeXml(e.tituloTrabajo)}
+                                                </div>
+
+                                                <!-- BOTONES VER Y DESCARGAR -->
+                                                <div class="attachment-actions">
+                                                    <button type="button"
+                                                            class="btn-hud btn-hud-view"
+                                                            data-url="${fn:escapeXml(fullUrl)}"
+                                                            data-title="${fn:escapeXml(e.tituloTrabajo)}"
+                                                            data-filename="${fn:escapeXml(e.nombreArchivo)}"
+                                                            onclick="openDocViewerFromBtn(this)">
+                                                        👁️ VER
+                                                    </button>
+                                                    <a href="${fn:escapeXml(downloadUrl)}"
+                                                       target="_blank"
+                                                       class="btn-hud btn-hud-download"
+                                                       download="${fn:escapeXml(e.nombreArchivo)}">
+                                                        ⬇️ DESCARGAR
                                                     </a>
-                                                </c:if>
-                                                <!-- BOTÓN ELIMINAR (SI HAY SESIÓN) -->
-                                                <c:if test="${not empty sessionScope.usuario}">
-                                                    <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Eliminar el trabajo \'${e.tituloTrabajo}\'?');">
-                                                        <input type="hidden" name="action" value="delete">
-                                                        <input type="hidden" name="id" value="${e.id}">
-                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                            🗑️ Eliminar
-                                                        </button>
-                                                    </form>
+                                                </div>
+
+                                                <!-- ACCIONES EXTRA (FIGMA / ELIMINAR) -->
+                                                <c:if test="${e.semana == 8 || fn:contains(fn:toLowerCase(e.tituloTrabajo), 'figma') || not empty sessionScope.usuario}">
+                                                    <div class="attachment-extra-actions">
+                                                        <c:if test="${e.semana == 8 || fn:contains(fn:toLowerCase(e.tituloTrabajo), 'figma')}">
+                                                            <a href="https://www.figma.com/design/kpkKx5iSVkcJjIFDCHov37/Sin-t%C3%ADtulo?node-id=2-3&t=NW402MHREiENVPpl-0" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="flex:1; justify-content:center; background: linear-gradient(135deg, #a259ff, #f24e1e); color: #fff; font-weight: 700; border: none; text-decoration: none;">
+                                                                🎨 Prototipo Figma
+                                                            </a>
+                                                        </c:if>
+                                                        <c:if test="${not empty sessionScope.usuario}">
+                                                            <form action="${pageContext.request.contextPath}/upload" method="post" style="display: inline;" onsubmit="return confirm('¿Eliminar el trabajo?');">
+                                                                <input type="hidden" name="action" value="delete">
+                                                                <input type="hidden" name="id" value="${e.id}">
+                                                                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar trabajo">
+                                                                    🗑️
+                                                                </button>
+                                                            </form>
+                                                        </c:if>
+                                                    </div>
                                                 </c:if>
                                             </div>
-                                        </td>
-                                    </tr>
-                                </c:if>
-                            </c:forEach>
-
-                            <!-- SI LA SEMANA NO TIENE TRABAJOS AÚN -->
-                            <c:if test="${not tieneArchivos}">
-                                <tr>
-                                    <td>
-                                        <span style="color: var(--text-muted);">Semana ${semIndex}</span>
-                                    </td>
-                                    <td>
-                                        <span style="font-size: 0.85rem; color: var(--text-secondary);">${RepositorioDAO.getTemaSemana(semIndex)}</span>
-                                    </td>
-                                    <td colspan="2">
-                                        <span class="status-pill status-wait">⌛ Sin entregables aún</span>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="openTab('sec-admin')">
-                                            ➕ Agregar Trabajo
-                                        </button>
-                                    </td>
-                                </tr>
-                            </c:if>
-                        </c:forEach>
-                    </tbody>
-                </table>
+                                        </c:if>
+                                    </c:forEach>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="week-empty-box">
+                                    <span class="status-pill status-wait">⌛ Sin entregables aún para esta semana</span>
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="openUploadForWeek(${semIndex})">
+                                        ➕ Subir Entregable
+                                    </button>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </c:forEach>
             </div>
         </div>
     </div>
@@ -352,11 +417,16 @@
     </div>
 
     <!-- VISOR FLOTANTE PARA VER ARCHIVOS E IMÁGENES EN PANTALLA SIN DESCARGAR -->
-    <div id="docViewerModal" class="modal-backdrop">
+    <div id="docViewerModal" class="modal-backdrop" onclick="if (event.target === this) closeDocViewer();">
         <div class="modal-window">
             <div class="modal-header">
-                <h3 id="modalDocTitle" style="font-size: 1rem; color: #ffffff;">Visor de Documentos UPLA</h3>
-                <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">✕ Cerrar Visor</button>
+                <h3 id="modalDocTitle" style="font-size: 1rem; color: #ffffff; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">Visor de Documentos UPLA</h3>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <a id="modalOpenNewTab" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="text-decoration: none;">
+                        ↗️ Abrir en Pestaña
+                    </a>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">✕ Cerrar Visor</button>
+                </div>
             </div>
             <div class="modal-body" id="modalDocContainer">
                 <!-- Se inyecta dinámicamente el visor -->
@@ -415,30 +485,63 @@
     });
 
     // VISOR DE IMÁGENES Y DOCUMENTOS EN PANTALLA SIN DESCARGAR
-    function openDocViewer(url, title) {
+    function openDocViewerFromBtn(btn) {
+        const url = btn.getAttribute("data-url") || "";
+        const title = btn.getAttribute("data-title") || "Documento";
+        const filename = btn.getAttribute("data-filename") || url;
+        openDocViewer(url, title, filename);
+    }
+
+    function openDocViewer(url, title, filename) {
         const modal = document.getElementById("docViewerModal");
         const modalTitle = document.getElementById("modalDocTitle");
+        const openNewTabLink = document.getElementById("modalOpenNewTab");
         const container = document.getElementById("modalDocContainer");
 
         modalTitle.textContent = "📖 Viendo: " + title;
+        if (openNewTabLink) {
+            openNewTabLink.href = url;
+        }
 
-        if (url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
-            container.innerHTML = `<img src="${url}" alt="${title}" style="max-width: 100%; max-height: 520px; object-fit: contain; border-radius: 8px;">`;
-        } else if (url.match(/\.sql$/i)) {
-            container.innerHTML = `<div style="text-align:center; padding: 2rem; color: #94a3b8;">Cargando script SQL...</div>`;
+        const refName = (filename || url || "").toLowerCase();
+
+        if (/\.(jpeg|jpg|gif|png|webp)$/i.test(refName)) {
+            container.innerHTML = '';
+            const img = document.createElement("img");
+            img.src = url;
+            img.alt = title;
+            img.style.maxWidth = "100%";
+            img.style.maxHeight = "540px";
+            img.style.objectFit = "contain";
+            img.style.borderRadius = "8px";
+            container.appendChild(img);
+        } else if (/\.sql$/i.test(refName)) {
+            container.innerHTML = '<div style="text-align:center; padding: 2rem; color: #94a3b8;">Cargando script SQL...</div>';
             fetch(url)
                 .then(r => r.text())
                 .then(sql => {
                     const escaped = sql.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                    container.innerHTML = `<pre style="max-height: 520px; overflow: auto; background: #0f172a; padding: 1.25rem; border-radius: 8px; color: #38bdf8; font-family: monospace; font-size: 0.85rem; line-height: 1.5; text-align: left; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap; word-break: break-all;"><code>` + escaped + `</code></pre>`;
+                    container.innerHTML = '<pre style="max-height: 540px; width: 100%; overflow: auto; background: #0f172a; padding: 1.25rem; border-radius: 8px; color: #38bdf8; font-family: monospace; font-size: 0.85rem; line-height: 1.5; text-align: left; border: 1px solid rgba(255,255,255,0.1); white-space: pre-wrap; word-break: break-all;"><code>' + escaped + '</code></pre>';
                 })
-                .catch(err => {
-                    container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
+                .catch(() => {
+                    container.innerHTML = '<iframe src="' + url + '" width="100%" height="550px" style="border:none; border-radius: 8px;"></iframe>';
                 });
-        } else if (url.match(/\.pdf$/i) || url.includes("pdf")) {
-            container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
+        } else if (/\.pdf$/i.test(refName) || url.toLowerCase().includes("pdf") || url.includes("archivo?id=")) {
+            container.innerHTML = '';
+            const iframe = document.createElement("iframe");
+            iframe.src = url + (url.includes("#") ? "" : "#view=FitH");
+            iframe.title = title;
+            iframe.style.width = "100%";
+            iframe.style.height = "550px";
+            iframe.style.border = "none";
+            iframe.style.borderRadius = "8px";
+            iframe.style.background = "#ffffff";
+            container.appendChild(iframe);
         } else {
-            container.innerHTML = `<iframe src="${url}" width="100%" height="520px" style="border:none; border-radius: 8px;"></iframe>`;
+            container.innerHTML = '<div style="text-align:center; padding: 2.5rem; color: #cbd5e1;">' +
+                '<p style="margin-bottom: 1rem;">Este formato de archivo no admite vista previa directa en el navegador.</p>' +
+                '<a href="' + url + '" target="_blank" class="btn btn-primary">⬇️ Descargar o Abrir Archivo</a>' +
+                '</div>';
         }
 
         modal.classList.add("active");
@@ -510,8 +613,36 @@
         }
     }
 
+    function openUploadForWeek(semana) {
+        openTab('sec-admin');
+        const select = document.querySelector('#sec-admin select[name="semana"]');
+        if (select) {
+            select.value = String(semana);
+        }
+    }
+
+    function filterEntregables() {
+        const query = (document.getElementById("searchEntregables")?.value || "").toLowerCase().trim();
+        const estado = document.getElementById("filterEstado")?.value || "all";
+        const cards = document.querySelectorAll(".week-hud-card");
+
+        cards.forEach(function(card) {
+            const text = card.textContent.toLowerCase();
+            const cardStatus = card.getAttribute("data-status");
+            const matchesText = !query || text.includes(query);
+            const matchesEstado = estado === "all" || cardStatus === estado;
+            card.style.display = (matchesText && matchesEstado) ? "" : "none";
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
         renderChart();
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get("msg");
+        const err = params.get("error");
+        if (msg === "upload_success" || msg === "delete_success" || err === "upload_failed" || err === "delete_failed" || err === "no_file_selected") {
+            openTab("sec-unidades");
+        }
     });
 </script>
 
