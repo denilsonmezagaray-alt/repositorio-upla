@@ -15,9 +15,9 @@ import java.util.logging.Logger;
 public class ConexionDB {
     private static final Logger LOGGER = Logger.getLogger(ConexionDB.class.getName());
 
-    // Configuración predeterminada o mediante Variables de Entorno (Render / Supabase)
-    private static final String DEFAULT_URL = "jdbc:postgresql://db.ymicgxwxvpzzhvcyjnxc.supabase.co:5432/postgres?sslmode=require";
-    private static final String DEFAULT_USER = "postgres";
+    // Configuración predeterminada IPv4 (Session Pooler de Supabase) o mediante Variables de Entorno (Render)
+    private static final String DEFAULT_URL = "jdbc:postgresql://aws-0-sa-east-1.pooler.supabase.com:5432/postgres?sslmode=require";
+    private static final String DEFAULT_USER = "postgres.ymicgxwxvpzzhvcyjnxc";
     private static final String DEFAULT_PASS = "Alessander260502";
 
     static {
@@ -38,13 +38,13 @@ public class ConexionDB {
         String dbUser = System.getenv("SUPABASE_DB_USER");
         String dbPass = System.getenv("SUPABASE_DB_PASS");
 
-        if (dbUrl == null || dbUrl.trim().isEmpty()) {
+        if (dbUrl == null || dbUrl.trim().isEmpty() || dbUrl.contains("db.ymicgxwxvpzzhvcyjnxc.supabase.co")) {
             dbUrl = DEFAULT_URL;
         }
         if (!dbUrl.contains("connectTimeout")) {
             dbUrl += (dbUrl.contains("?") ? "&" : "?") + "connectTimeout=10&socketTimeout=25";
         }
-        if (dbUser == null || dbUser.trim().isEmpty()) {
+        if (dbUser == null || dbUser.trim().isEmpty() || "postgres".equals(dbUser.trim())) {
             dbUser = DEFAULT_USER;
         }
         if (dbPass == null || dbPass.trim().isEmpty()) {
