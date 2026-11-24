@@ -438,6 +438,17 @@
     <footer class="footer">
         <p><strong>UNIVERSIDAD PERUANA LOS ANDES &bull; FACULTAD DE INGENIERÍA</strong></p>
         <p>Portafolio Digital de Arquitectura de Software 2026-I &bull; Desarrollado por <strong>Alessander Meza Garay</strong> (Código: r03396b &bull; Correo: r03396b@ms.upla.edu.pe)</p>
+        <p style="margin-top: 0.5rem; font-size: 0.78rem;">
+            <c:set var="dbErr" value="${RepositorioDAO.getUltimoErrorBD()}" />
+            <c:choose>
+                <c:when test="${empty dbErr}">
+                    <span style="color: #34d399;">🟢 Conectado a Supabase PostgreSQL (Persistencia activa)</span>
+                </c:when>
+                <c:otherwise>
+                    <span style="color: #f87171;">🔴 Modo Memoria Temporal (Sin conexión a Supabase: ${fn:escapeXml(dbErr)})</span>
+                </c:otherwise>
+            </c:choose>
+        </p>
     </footer>
 </div>
 

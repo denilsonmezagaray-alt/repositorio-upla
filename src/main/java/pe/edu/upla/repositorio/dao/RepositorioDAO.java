@@ -26,6 +26,11 @@ public class RepositorioDAO {
     private static List<Entregable> MEMORIA_ENTREGABLES = null;
     private static final java.util.Map<Integer, ArchivoData> MEMORIA_ARCHIVOS = new java.util.concurrent.ConcurrentHashMap<>();
     private static final AtomicInteger AUTO_ID = new AtomicInteger(100);
+    private static volatile String ultimoErrorBD = null;
+
+    public static String getUltimoErrorBD() {
+        return ultimoErrorBD;
+    }
 
     private static final String[] TEMAS_SILABO = {
         "Semana 01: Introducción a la Arquitectura de Software y Conceptos Fundamentales",
@@ -300,9 +305,11 @@ public class RepositorioDAO {
                     ent.setFechaSubida(rs.getTimestamp("fecha_subida"));
                     lista.add(ent);
                 }
+                ultimoErrorBD = null;
                 return lista;
             } catch (Exception e) {
                 ultimoError = e;
+                ultimoErrorBD = e.getClass().getSimpleName() + ": " + e.getMessage();
                 LOGGER.log(Level.WARNING, "Intento " + intento + " de conexión a BD falló: " + e.getMessage());
                 if (intento == 1) {
                     try { Thread.sleep(600); } catch (InterruptedException ignored) {}
