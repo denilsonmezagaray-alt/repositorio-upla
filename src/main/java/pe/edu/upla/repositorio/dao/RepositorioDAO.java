@@ -353,9 +353,17 @@ public class RepositorioDAO {
                     lista.add(ent);
                 }
 
-                // Si la tabla en Supabase está vacía, sembrar los 10 entregables base (Semanas 1-8)
-                if (lista.isEmpty()) {
+                // Si no hay ningún entregable de las Semanas 1-8 en Supabase, sembrar los 10 entregables base
+                boolean tieneBase1a8 = false;
+                for (Entregable item : lista) {
+                    if (item.getSemana() >= 1 && item.getSemana() <= 8) {
+                        tieneBase1a8 = true;
+                        break;
+                    }
+                }
+                if (!tieneBase1a8) {
                     sembrarEntregablesIniciales(con);
+                    lista.clear();
                     try (PreparedStatement ps2 = con.prepareStatement(sql);
                          ResultSet rs2 = ps2.executeQuery()) {
                         while (rs2.next()) {
