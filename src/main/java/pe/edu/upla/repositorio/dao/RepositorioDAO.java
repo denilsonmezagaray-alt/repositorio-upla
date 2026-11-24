@@ -276,18 +276,44 @@ public class RepositorioDAO {
         }
     }
 
+    private void asegurarUnidadesBase(Connection con) {
+        try (PreparedStatement check = con.prepareStatement("SELECT COUNT(*) FROM unidades");
+             ResultSet rs = check.executeQuery()) {
+            if (rs.next() && rs.getInt(1) == 0) {
+                String sql = "INSERT INTO unidades (numero, nombre, descripcion) VALUES (?, ?, ?)";
+                try (PreparedStatement ps = con.prepareStatement(sql)) {
+                    Object[][] data = {
+                        {1, "Fundamentos y Estándares de Arquitectura", "Introducción, ISO/IEC 25010, Estilos y Vistas 4+1"},
+                        {2, "Modelado de Arquitecturas con POO y Vistas 4+1", "Principios POO, Diagramas UML y Componentes"},
+                        {3, "Comunicación, Integración y Servicios Web REST", "Protocolos de Integración, REST APIs y JSON/XML"},
+                        {4, "Frameworks Modernos y Despliegue en Cloud", "Patrón Java EE MVC, Tomcat 9, Docker y Render"}
+                    };
+                    for (Object[] row : data) {
+                        ps.setInt(1, (Integer) row[0]);
+                        ps.setString(2, (String) row[1]);
+                        ps.setString(3, (String) row[2]);
+                        ps.addBatch();
+                    }
+                    ps.executeBatch();
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error al asegurar unidades base: " + e.getMessage());
+        }
+    }
+
     private synchronized void sembrarEntregablesIniciales(Connection con) {
+        asegurarUnidadesBase(con);
         String insertSql = "INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url, fecha_subida) " +
-                           "VALUES (?, COALESCE((SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?), ?, ?, ?, CURRENT_TIMESTAMP)";
+                           "VALUES (?, (SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?, ?, ?, CURRENT_TIMESTAMP)";
         List<Entregable> base = getMemoriaEntregables();
         try (PreparedStatement ps = con.prepareStatement(insertSql)) {
             for (Entregable e : base) {
                 ps.setInt(1, e.getSemana());
                 ps.setInt(2, e.getUnidadNumero());
-                ps.setInt(3, e.getUnidadNumero());
-                ps.setString(4, e.getTituloTrabajo());
-                ps.setString(5, e.getNombreArchivo());
-                ps.setString(6, e.getArchivoUrl());
+                ps.setString(3, e.getTituloTrabajo());
+                ps.setString(4, e.getNombreArchivo());
+                ps.setString(5, e.getArchivoUrl());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -346,6 +372,9 @@ public class RepositorioDAO {
                             lista.add(ent);
                         }
                     }
+                    if (lista.isEmpty()) {
+                        return getMemoriaEntregables();
+                    }
                 }
 
                 ultimoErrorBD = null;
@@ -388,6 +417,7 @@ public class RepositorioDAO {
         boolean ok = false;
         int generatedId = -1;
         try (Connection con = ConexionDB.getConexion()) {
+            asegurarUnidadesBase(con);
             asegurarTablaArchivos(con);
 
             try (PreparedStatement ps = con.prepareStatement(sql)) {
