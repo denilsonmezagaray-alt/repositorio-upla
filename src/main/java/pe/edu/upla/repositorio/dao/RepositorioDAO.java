@@ -24,6 +24,7 @@ public class RepositorioDAO {
     private static final Logger LOGGER = Logger.getLogger(RepositorioDAO.class.getName());
 
     private static List<Entregable> MEMORIA_ENTREGABLES = null;
+    private static final java.util.Map<Integer, ArchivoData> MEMORIA_ARCHIVOS = new java.util.concurrent.ConcurrentHashMap<>();
     private static final AtomicInteger AUTO_ID = new AtomicInteger(100);
 
     private static final String[] TEMAS_SILABO = {
@@ -258,7 +259,7 @@ public class RepositorioDAO {
 
     private void asegurarTablaArchivos(Connection con) {
         String ddl = "CREATE TABLE IF NOT EXISTS entregables_archivos (" +
-                     "entregable_id INTEGER PRIMARY KEY REFERENCES entregables(id) ON DELETE CASCADE, " +
+                     "entregable_id INTEGER PRIMARY KEY, " +
                      "nombre_archivo TEXT NOT NULL, " +
                      "content_type TEXT, " +
                      "contenido BYTEA NOT NULL, " +
@@ -356,7 +357,20 @@ public class RepositorioDAO {
             }
 
             if (ok && generatedId > 0) {
+                // Si no había URL pública de Supabase Storage, apuntar al servlet local respaldado por PostgreSQL
+                if (archivoUrl == null || archivoUrl.trim().isEmpty()) {
+                    urlInicial = "archivo?id=" + generatedId;
+                    try (PreparedStatement psUpd = con.prepareStatement("UPDATE entregables SET archivo_url = ? WHERE id = ?")) {
+                        psUpd.setString(1, urlInicial);
+                        psUpd.setInt(2, generatedId);
+                        psUpd.executeUpdate();
+                    } catch (Exception updEx) {
+                        LOGGER.log(Level.WARNING, "No se pudo actualizar archivo_url (id=" + generatedId + "): " + updEx.getMessage());
+                    }
+                }
+
                 if (contenidoArchivo != null && contenidoArchivo.length > 0) {
+                    MEMORIA_ARCHIVOS.put(generatedId, new ArchivoData(nombreArchivo, contentType, contenidoArchivo));
                     String sqlArchivo = "INSERT INTO entregables_archivos (entregable_id, nombre_archivo, content_type, contenido) " +
                                         "VALUES (?, ?, ?, ?) " +
                                         "ON CONFLICT (entregable_id) DO UPDATE SET nombre_archivo = EXCLUDED.nombre_archivo, " +
@@ -367,16 +381,8 @@ public class RepositorioDAO {
                         psArch.setString(3, contentType != null ? contentType : "application/octet-stream");
                         psArch.setBytes(4, contenidoArchivo);
                         psArch.executeUpdate();
-                    }
-                }
-
-                // Si no había URL pública de Supabase Storage, apuntar al servlet local respaldado por PostgreSQL
-                if (archivoUrl == null || archivoUrl.trim().isEmpty()) {
-                    urlInicial = "archivo?id=" + generatedId;
-                    try (PreparedStatement psUpd = con.prepareStatement("UPDATE entregables SET archivo_url = ? WHERE id = ?")) {
-                        psUpd.setString(1, urlInicial);
-                        psUpd.setInt(2, generatedId);
-                        psUpd.executeUpdate();
+                    } catch (Exception archEx) {
+                        LOGGER.log(Level.SEVERE, "Error al guardar binario en entregables_archivos (id=" + generatedId + "): " + archEx.getMessage(), archEx);
                     }
                 }
             }
@@ -392,8 +398,16 @@ public class RepositorioDAO {
             "Frameworks Modernos y Despliegue en Cloud"
         };
 
+        int finalId = generatedId > 0 ? generatedId : AUTO_ID.incrementAndGet();
+        if (contenidoArchivo != null && contenidoArchivo.length > 0) {
+            MEMORIA_ARCHIVOS.putIfAbsent(finalId, new ArchivoData(nombreArchivo, contentType, contenidoArchivo));
+            if (archivoUrl == null || archivoUrl.trim().isEmpty()) {
+                urlInicial = "archivo?id=" + finalId;
+            }
+        }
+
         Entregable nuevo = new Entregable();
-        nuevo.setId(generatedId > 0 ? generatedId : AUTO_ID.incrementAndGet());
+        nuevo.setId(finalId);
         nuevo.setSemana(semana);
         nuevo.setUnidadId(unidadNum);
         nuevo.setUnidadNumero(unidadNum);
@@ -424,23 +438,28 @@ public class RepositorioDAO {
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Error al obtener archivo de BD (id=" + entregableId + "): " + e.getMessage());
         }
-        return null;
+        return MEMORIA_ARCHIVOS.get(entregableId);
     }
 
     /**
      * Elimina un archivo específico por su ID único.
      */
     public boolean eliminarEntregable(int id) {
-        String sql = "DELETE FROM entregables WHERE id = ?";
-        try (Connection con = ConexionDB.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
+        try (Connection con = ConexionDB.getConexion()) {
+            try (PreparedStatement psArch = con.prepareStatement("DELETE FROM entregables_archivos WHERE entregable_id = ?")) {
+                psArch.setInt(1, id);
+                psArch.executeUpdate();
+            } catch (Exception ignored) {}
 
-            ps.setInt(1, id);
-            ps.executeUpdate();
+            try (PreparedStatement ps = con.prepareStatement("DELETE FROM entregables WHERE id = ?")) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error al eliminar entregable en BD: " + e.getMessage());
         }
 
+        MEMORIA_ARCHIVOS.remove(id);
         List<Entregable> memoria = getMemoriaEntregables();
         memoria.removeIf(e -> e.getId() == id);
         return true;
