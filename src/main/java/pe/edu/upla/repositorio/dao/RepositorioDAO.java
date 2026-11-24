@@ -276,6 +276,27 @@ public class RepositorioDAO {
         }
     }
 
+    private synchronized void sembrarEntregablesIniciales(Connection con) {
+        String insertSql = "INSERT INTO entregables (semana, unidad_id, titulo_trabajo, nombre_archivo, archivo_url, fecha_subida) " +
+                           "VALUES (?, COALESCE((SELECT id FROM unidades WHERE numero = ? LIMIT 1), ?), ?, ?, ?, CURRENT_TIMESTAMP)";
+        List<Entregable> base = getMemoriaEntregables();
+        try (PreparedStatement ps = con.prepareStatement(insertSql)) {
+            for (Entregable e : base) {
+                ps.setInt(1, e.getSemana());
+                ps.setInt(2, e.getUnidadNumero());
+                ps.setInt(3, e.getUnidadNumero());
+                ps.setString(4, e.getTituloTrabajo());
+                ps.setString(5, e.getNombreArchivo());
+                ps.setString(6, e.getArchivoUrl());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            LOGGER.info("Se sembraron " + base.size() + " entregables iniciales (Semanas 1-8) en Supabase.");
+        } catch (Exception ex) {
+            LOGGER.log(Level.WARNING, "Error al sembrar entregables iniciales en Supabase: " + ex.getMessage());
+        }
+    }
+
     public List<Entregable> obtenerEntregables() {
         List<Entregable> lista = new ArrayList<>();
         String sql = "SELECT e.id, e.semana, e.unidad_id, COALESCE(u.numero, ((e.semana - 1) / 4) + 1) AS unidad_numero, " +
@@ -305,6 +326,28 @@ public class RepositorioDAO {
                     ent.setFechaSubida(rs.getTimestamp("fecha_subida"));
                     lista.add(ent);
                 }
+
+                // Si la tabla en Supabase está vacía, sembrar los 10 entregables base (Semanas 1-8)
+                if (lista.isEmpty()) {
+                    sembrarEntregablesIniciales(con);
+                    try (PreparedStatement ps2 = con.prepareStatement(sql);
+                         ResultSet rs2 = ps2.executeQuery()) {
+                        while (rs2.next()) {
+                            Entregable ent = new Entregable();
+                            ent.setId(rs2.getInt("id"));
+                            ent.setSemana(rs2.getInt("semana"));
+                            ent.setUnidadId(rs2.getInt("unidad_id"));
+                            ent.setUnidadNumero(rs2.getInt("unidad_numero"));
+                            ent.setNombreUnidad(rs2.getString("nombre_unidad"));
+                            ent.setTituloTrabajo(rs2.getString("titulo_trabajo"));
+                            ent.setNombreArchivo(rs2.getString("nombre_archivo"));
+                            ent.setArchivoUrl(rs2.getString("archivo_url"));
+                            ent.setFechaSubida(rs2.getTimestamp("fecha_subida"));
+                            lista.add(ent);
+                        }
+                    }
+                }
+
                 ultimoErrorBD = null;
                 return lista;
             } catch (Exception e) {
