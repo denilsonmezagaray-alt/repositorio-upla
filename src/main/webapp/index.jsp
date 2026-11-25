@@ -19,7 +19,7 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
     <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125e">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125f">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>

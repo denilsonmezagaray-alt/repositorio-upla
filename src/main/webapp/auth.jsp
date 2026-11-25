@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Alumno Administrador | UPLA Arquitectura de Software</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125e">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125f">
     <style>
         .auth-wrapper {
             max-width: 460px;
