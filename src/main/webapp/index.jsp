@@ -19,10 +19,11 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
     <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125b">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<div id="greenLanternGlow"></div>
 
 <div class="container">
     <!-- BARRA SUPERIOR INSTITUCIONAL -->
@@ -595,16 +596,16 @@
                         label: 'Semanas Completadas por Unidad',
                         data: dataCompletadas,
                         backgroundColor: [
-                            'rgba(0, 163, 224, 0.85)',
-                            'rgba(16, 185, 129, 0.85)',
-                            'rgba(139, 92, 246, 0.85)',
-                            'rgba(245, 158, 11, 0.85)'
+                            'rgba(18, 140, 112, 0.85)',
+                            'rgba(210, 105, 30, 0.85)',
+                            'rgba(230, 174, 39, 0.85)',
+                            'rgba(161, 73, 125, 0.85)'
                         ],
                         borderColor: [
-                            '#00a3e0',
-                            '#10b981',
-                            '#8b5cf6',
-                            '#f59e0b'
+                            '#2aa889',
+                            '#d2691e',
+                            '#e6ae27',
+                            '#a1497d'
                         ],
                         borderWidth: 2,
                         borderRadius: 8
@@ -665,6 +666,40 @@
         const err = params.get("error");
         if (msg === "upload_success" || msg === "delete_success" || err === "upload_failed" || err === "delete_failed" || err === "no_file_selected") {
             openTab("sec-unidades");
+        }
+
+        // Halo de linterna verde siguiendo suavemente al mouse
+        const glow = document.getElementById("greenLanternGlow");
+        if (glow) {
+            let targetX = window.innerWidth / 2, targetY = window.innerHeight / 2;
+            let currentX = targetX, currentY = targetY;
+            let animating = false;
+
+            function updateGlow() {
+                currentX += (targetX - currentX) * 0.16;
+                currentY += (targetY - currentY) * 0.16;
+                glow.style.setProperty("--mx", currentX + "px");
+                glow.style.setProperty("--my", currentY + "px");
+                if (Math.abs(targetX - currentX) > 0.5 || Math.abs(targetY - currentY) > 0.5) {
+                    requestAnimationFrame(updateGlow);
+                } else {
+                    animating = false;
+                }
+            }
+
+            document.addEventListener("mousemove", function(e) {
+                targetX = e.clientX;
+                targetY = e.clientY;
+                glow.style.opacity = "1";
+                if (!animating) {
+                    animating = true;
+                    requestAnimationFrame(updateGlow);
+                }
+            });
+
+            document.addEventListener("mouseleave", function() {
+                glow.style.opacity = "0";
+            });
         }
     });
 </script>

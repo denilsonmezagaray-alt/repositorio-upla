@@ -8,26 +8,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-    /* UPLA Corporate Palette */
-    --upla-blue-600: #0052cc;
-    --upla-blue-700: #003e99;
-    --upla-navy: #0a192f;
-    --upla-cyan: #00a3e0;
+    /* Paleta Cálida (Petróleo, Esmeralda Cálido, Oliva, Terracota, Mostaza, Ciruela) */
+    --upla-blue-600: #128c70;
+    --upla-blue-700: #0c6b55;
+    --upla-navy: #0e1e21;
+    --upla-cyan: #e6ae27;
+    --warm-terracotta: #d2691e;
+    --warm-plum: #a1497d;
+    --warm-olive: #6b9629;
     
-    /* Neutrals */
-    --bg-dark: #0b1329;
-    --bg-card: #132247;
-    --bg-card-hover: #172a57;
-    --border-card: rgba(255, 255, 255, 0.1);
+    /* Neutrals Cálidos Oscuros */
+    --bg-dark: #0b1416;
+    --bg-card: #132226;
+    --bg-card-hover: #1a2e33;
+    --border-card: rgba(230, 174, 39, 0.16);
     
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --text-accent: #38bdf8;
+    --text-primary: #fdfbf7;
+    --text-secondary: #b8c2c0;
+    --text-muted: #7e8f8c;
+    --text-accent: #e6ae27;
 
-    --success-bg: rgba(16, 185, 129, 0.15);
-    --success-text: #34d399;
-    --success-border: rgba(16, 185, 129, 0.3);
+    --success-bg: rgba(18, 140, 112, 0.18);
+    --success-text: #4ade80;
+    --success-border: rgba(42, 168, 137, 0.4);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -46,7 +49,9 @@
 body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-dark);
-    background-image: radial-gradient(circle at 50% 0%, rgba(0, 82, 204, 0.15) 0%, transparent 60%);
+    background-image:
+        radial-gradient(circle at 18% 0%, rgba(18, 140, 112, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 85% 10%, rgba(210, 105, 30, 0.14) 0%, transparent 45%);
     background-attachment: fixed;
     color: var(--text-primary);
     min-height: 100vh;
@@ -70,11 +75,11 @@ body {
     padding: 1rem 1.75rem;
     margin-top: 1rem;
     margin-bottom: 1.5rem;
-    background: rgba(19, 34, 71, 0.85);
+    background: rgba(19, 34, 38, 0.88);
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-lg);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 .brand-section {
@@ -106,7 +111,7 @@ body {
 .nav-tabs {
     display: flex;
     gap: 0.5rem;
-    background: rgba(11, 19, 41, 0.6);
+    background: rgba(14, 26, 29, 0.8);
     padding: 4px;
     border-radius: var(--radius-md);
     border: 1px solid var(--border-card);
@@ -138,9 +143,9 @@ body {
 }
 
 .tab-link.active {
-    background: var(--upla-blue-600);
+    background: linear-gradient(135deg, #128c70, #0c6b55);
     color: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 82, 204, 0.4);
+    box-shadow: 0 4px 14px rgba(18, 140, 112, 0.45);
 }
 
 /* Content Section Panels */
@@ -507,16 +512,16 @@ body {
 }
 
 .week-hud-card {
-    background: linear-gradient(180deg, rgba(10, 17, 36, 0.96) 0%, rgba(7, 12, 26, 0.98) 100%);
-    border: 1px solid rgba(0, 229, 255, 0.25);
+    background: linear-gradient(180deg, rgba(19, 34, 38, 0.96) 0%, rgba(12, 22, 24, 0.98) 100%);
+    border: 1px solid rgba(18, 140, 112, 0.35);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 24px rgba(0, 229, 255, 0.04);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 24px rgba(230, 174, 39, 0.04);
     transition: var(--transition);
 }
 
 .week-hud-card:hover {
-    border-color: rgba(0, 229, 255, 0.45);
+    border-color: rgba(230, 174, 39, 0.55);
 }
 
 .week-hud-header {
@@ -532,7 +537,7 @@ body {
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.25rem;
     font-weight: 700;
-    color: #f8fafc;
+    color: #fdfbf7;
     letter-spacing: 0.01em;
 }
 
@@ -542,12 +547,12 @@ body {
     gap: 0.5rem;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.82rem;
-    color: #00e5ff;
+    color: #e6ae27;
     margin-top: 0.35rem;
 }
 
 .week-hud-desc {
-    color: #94a3b8;
+    color: #b8c2c0;
     font-size: 0.9rem;
     margin-bottom: 1.15rem;
 }
@@ -561,20 +566,20 @@ body {
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #00e5ff;
+    color: #2aa889;
     margin-bottom: 1rem;
 }
 
 .attachments-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
     gap: 1.15rem;
 }
 
 .attachment-card {
     position: relative;
-    background: rgba(12, 18, 36, 0.92);
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    background: rgba(14, 25, 28, 0.94);
+    border: 1px solid rgba(230, 174, 39, 0.18);
     padding: 0.75rem;
     display: flex;
     flex-direction: column;
@@ -585,11 +590,11 @@ body {
 
 .attachment-card:hover {
     transform: translateY(-2px);
-    border-color: rgba(0, 229, 255, 0.4);
+    border-color: rgba(42, 168, 137, 0.55);
     box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
 }
 
-/* Esquinas HUD cian (arriba-izq) y magenta (abajo-der) */
+/* Esquinas HUD cálidas: esmeralda (arriba-izq) y terracota/mostaza (abajo-der) */
 .attachment-card::before,
 .attachment-card::after {
     content: "";
@@ -602,15 +607,15 @@ body {
 .attachment-card::before {
     top: -1px;
     left: -1px;
-    border-top: 2px solid #00e5ff;
-    border-left: 2px solid #00e5ff;
+    border-top: 2px solid #2aa889;
+    border-left: 2px solid #2aa889;
 }
 
 .attachment-card::after {
     bottom: -1px;
     right: -1px;
-    border-bottom: 2px solid #ff2a85;
-    border-right: 2px solid #ff2a85;
+    border-bottom: 2px solid #d2691e;
+    border-right: 2px solid #d2691e;
 }
 
 .attachment-thumb {
@@ -723,25 +728,25 @@ body {
 }
 
 .btn-hud-view {
-    background: rgba(0, 229, 255, 0.08);
-    color: #e0f7ff;
-    border: 1px solid rgba(0, 229, 255, 0.55);
+    background: rgba(18, 140, 112, 0.14);
+    color: #e6fff8;
+    border: 1px solid rgba(42, 168, 137, 0.65);
 }
 
 .btn-hud-view:hover {
-    background: rgba(0, 229, 255, 0.2);
-    box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+    background: rgba(18, 140, 112, 0.3);
+    box-shadow: 0 0 12px rgba(42, 168, 137, 0.35);
 }
 
 .btn-hud-download {
-    background: rgba(255, 42, 133, 0.08);
-    color: #ffe4f0;
-    border: 1px solid rgba(255, 42, 133, 0.55);
+    background: rgba(210, 105, 30, 0.14);
+    color: #fff0e5;
+    border: 1px solid rgba(230, 174, 39, 0.6);
 }
 
 .btn-hud-download:hover {
-    background: rgba(255, 42, 133, 0.22);
-    box-shadow: 0 0 12px rgba(255, 42, 133, 0.3);
+    background: rgba(210, 105, 30, 0.3);
+    box-shadow: 0 0 12px rgba(230, 174, 39, 0.35);
 }
 
 .attachment-extra-actions {
@@ -757,7 +762,24 @@ body {
     flex-wrap: wrap;
     gap: 0.75rem;
     padding: 0.85rem 1rem;
-    background: rgba(15, 23, 42, 0.55);
-    border: 1px dashed rgba(148, 163, 184, 0.25);
+    background: rgba(15, 29, 32, 0.6);
+    border: 1px dashed rgba(230, 174, 39, 0.28);
     border-radius: 6px;
+}
+
+/* Halo de Linterna Verde siguiendo el cursor */
+#greenLanternGlow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0;
+    background: radial-gradient(
+        420px circle at var(--mx, 50%) var(--my, 50%),
+        rgba(34, 211, 153, 0.20),
+        rgba(16, 185, 129, 0.10) 35%,
+        rgba(107, 150, 41, 0.04) 60%,
+        transparent 78%
+    );
+    transition: opacity 0.35s ease;
 }
