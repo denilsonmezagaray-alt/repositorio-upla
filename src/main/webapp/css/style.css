@@ -258,13 +258,38 @@ body {
 }
 
 .unit-card {
-    background: rgba(11, 19, 41, 0.7);
+    background: rgba(14, 26, 29, 0.8);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-md);
     padding: 1.25rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.unit-card:hover {
+    background: #343b3e;
+    border-color: rgba(203, 213, 225, 0.55);
+    transform: translateY(-4px);
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+}
+
+.unit-shortcut-hint {
+    margin-top: 0.6rem;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.3rem;
+    transition: color 0.25s ease;
+}
+
+.unit-card:hover .unit-shortcut-hint {
+    color: #e2e8f0;
 }
 
 .unit-badge {
@@ -782,4 +807,33 @@ body {
         transparent 78%
     );
     transition: opacity 0.35s ease;
+}
+
+/* Introducción y botón de video YouTube en cada semana */
+.week-intro-box {
+    background: rgba(18, 140, 112, 0.09);
+    border-left: 3px solid #e6ae27;
+    padding: 0.65rem 0.95rem;
+    border-radius: 0 8px 8px 0;
+    color: #cbd5e1;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    margin-bottom: 1.15rem;
+}
+
+.btn-yt-video {
+    background: rgba(181, 56, 53, 0.18);
+    color: #fecaca;
+    border: 1px solid rgba(201, 93, 104, 0.6);
+    font-weight: 700;
+}
+
+.btn-yt-video:hover {
+    background: rgba(181, 56, 53, 0.38);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(201, 93, 104, 0.35);
+}
+
+.week-highlight {
+    box-shadow: 0 0 0 2px #e6ae27, 0 0 28px rgba(230, 174, 39, 0.45) !important;
 }

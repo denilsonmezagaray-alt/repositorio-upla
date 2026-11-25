@@ -19,7 +19,7 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
     <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125b">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125c">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -166,7 +166,7 @@
 
             <div class="units-grid">
                 <c:forEach var="u" items="${unidades}">
-                    <div class="unit-card">
+                    <div class="unit-card" onclick="scrollToUnit(${u.numero})" title="Ir a las tareas de la Unidad ${u.numero}">
                         <div>
                             <span class="unit-badge">UNIDAD ${u.numero} &bull; SEMANAS ${((u.numero-1)*4)+1}-${u.numero*4}</span>
                             <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem;">${u.nombre}</h3>
@@ -180,6 +180,7 @@
                                 <span>Progreso: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
                                 <span>${u.semanasCompletadas} / 4 Semanas</span>
                             </div>
+                            <div class="unit-shortcut-hint">↘ Ir a tareas de esta unidad</div>
                         </div>
                     </div>
                 </c:forEach>
@@ -221,7 +222,7 @@
                         </c:if>
                     </c:forEach>
 
-                    <div class="week-hud-card" data-status="${tieneArchivos ? 'done' : 'pending'}">
+                    <div class="week-hud-card" id="semana-${semIndex}" data-status="${tieneArchivos ? 'done' : 'pending'}">
                         <div class="week-hud-header">
                             <div>
                                 <div class="week-hud-title">Semana ${semIndex}</div>
@@ -239,12 +240,24 @@
                                     <span>${countSemana} ${countSemana == 1 ? 'archivo' : 'archivos'}</span>
                                 </div>
                             </div>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
-                                ➕ Agregar Trabajo
-                            </button>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                                <button type="button"
+                                        class="btn btn-sm btn-yt-video"
+                                        data-videoid="${RepositorioDAO.getVideoIdSemana(semIndex)}"
+                                        data-title="Semana ${semIndex} - Video Guía"
+                                        onclick="openVideoModalFromBtn(this)">
+                                    ▶️ Video YouTube
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
+                                    ➕ Agregar Trabajo
+                                </button>
+                            </div>
                         </div>
 
-                        <p class="week-hud-desc">${RepositorioDAO.getTemaSemana(semIndex)}</p>
+                        <p class="week-hud-desc" style="margin-bottom: 0.65rem; font-weight: 600; color: #f1f5f9;">${RepositorioDAO.getTemaSemana(semIndex)}</p>
+                        <div class="week-intro-box">
+                            💡 <strong>Introducción:</strong> ${RepositorioDAO.getIntroduccionSemana(semIndex)}
+                        </div>
 
                         <c:choose>
                             <c:when test="${tieneArchivos}">
@@ -635,6 +648,59 @@
         } catch (e) {
             console.log("Error rendering chart:", e);
         }
+    }
+
+    function scrollToUnit(unidadNumero) {
+        const firstWeek = (unidadNumero - 1) * 4 + 1;
+        const search = document.getElementById("searchEntregables");
+        const filter = document.getElementById("filterEstado");
+        if (search) search.value = "";
+        if (filter) filter.value = "all";
+        filterEntregables();
+
+        const targetCard = document.getElementById("semana-" + firstWeek);
+        if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            targetCard.classList.add("week-highlight");
+            setTimeout(function() {
+                targetCard.classList.remove("week-highlight");
+            }, 1800);
+        }
+    }
+
+    function openVideoModalFromBtn(btn) {
+        const videoId = btn.getAttribute("data-videoid");
+        const title = btn.getAttribute("data-title") || "Video relacionado";
+        openVideoModal(videoId, title);
+    }
+
+    function openVideoModal(videoId, title) {
+        const modal = document.getElementById("docViewerModal");
+        const modalTitle = document.getElementById("modalDocTitle");
+        const openNewTabLink = document.getElementById("modalOpenNewTab");
+        const container = document.getElementById("modalDocContainer");
+
+        const watchUrl = "https://www.youtube.com/watch?v=" + videoId;
+        const embedUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0";
+
+        modalTitle.textContent = "🎬 " + title;
+        if (openNewTabLink) {
+            openNewTabLink.href = watchUrl;
+        }
+
+        container.innerHTML = "";
+        const iframe = document.createElement("iframe");
+        iframe.src = embedUrl;
+        iframe.title = title;
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+        iframe.style.width = "100%";
+        iframe.style.height = "550px";
+        iframe.style.border = "none";
+        iframe.style.borderRadius = "8px";
+        container.appendChild(iframe);
+
+        modal.classList.add("active");
     }
 
     function openUploadForWeek(semana) {

@@ -579,4 +579,44 @@ public class RepositorioDAO {
         }
         return "Semana " + semana;
     }
+
+    private static final String[] INTRODUCCIONES_SEMANA = {
+        "Explora qué es la arquitectura de software, sus elementos clave y cómo define la estructura base de un sistema.",
+        "Analiza los atributos de calidad del estándar ISO/IEC 25010 (rendimiento, seguridad, mantenibilidad) aplicados a sistemas reales.",
+        "Compara estilos y patrones arquitectónicos clásicos como Capas (N-Tier), MVC y Cliente-Servidor.",
+        "Documenta arquitecturas de forma profesional usando el modelo de 4+1 vistas de Kruchten y los estándares ISO 42010 / C4.",
+        "Aplica los principios SOLID y buenas prácticas de Programación Orientada a Objetos para lograr código desacoplado.",
+        "Modela sistemas mediante diagramas UML esenciales: Casos de Uso, Clases y Paquetes.",
+        "Diseña el esquema físico de una base de datos relacional en la nube (Microsoft Azure SQL / PostgreSQL) con integridad referencial.",
+        "Prototipa interfaces de usuario modernas e interactivas con Figma antes de pasar a código.",
+        "Comprende cómo se comunican los componentes distribuidos mediante protocolos de red y mensajería.",
+        "Diseña e integra servicios mediante APIs RESTful utilizando métodos HTTP y buenas prácticas de endpoints.",
+        "Estructura el intercambio de datos entre sistemas comparando los formatos JSON y XML.",
+        "Valida e implementa la comunicación entre servicios y microservicios asegurando contratos de datos confiables.",
+        "Evalúa frameworks modernos de arquitectura que agilizan el desarrollo empresarial en Java.",
+        "Aplica normas de escalabilidad, tolerancia a fallos y seguridad para sistemas en producción.",
+        "Construye una aplicación web completa siguiendo el patrón Java EE MVC con Servlets, JSP y JDBC.",
+        "Empaqueta tu sistema con Docker y despliégalo en la nube (Render + Supabase) listo para producción."
+    };
+
+    private static final String[] VIDEOS_YOUTUBE_SEMANA = {
+        "CWcfNuO696M", "syiwCk5dOfQ", "V-jNdhey-w0", "C6RJmSlEscU",
+        "g1shhx5Nvv8", "fJa3cshrFWs", "wvQ2Cv00zd8", "D67dsBh1_uc",
+        "mKqfw5CDKco", "u2Ms34GE14U", "cQnwAoW80r0", "2sFczigWppk",
+        "PcoeGzGomqs", "Stb9dxndD5o", "2EC9CSurj0A", "dOwaEhP3k5c"
+    };
+
+    public static String getIntroduccionSemana(int semana) {
+        if (semana >= 1 && semana <= 16) {
+            return INTRODUCCIONES_SEMANA[semana - 1];
+        }
+        return "Contenido académico de la semana " + semana + ".";
+    }
+
+    public static String getVideoIdSemana(int semana) {
+        if (semana >= 1 && semana <= 16) {
+            return VIDEOS_YOUTUBE_SEMANA[semana - 1];
+        }
+        return "CWcfNuO696M";
+    }
 }
