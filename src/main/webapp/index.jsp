@@ -19,7 +19,7 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
     <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125c">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125d">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -155,20 +155,23 @@
         </div>
     </div>
 
-    <!-- PESTAÑA 2: UNIDADES Y TABLA DE ENTREGABLES MÚLTIPLES -->
+    <!-- PESTAÑA 2: UNIDADES (4 MÓDULOS COMO ATAJOS) Y VISTA DEDICADA POR MÓDULO -->
     <div id="sec-unidades" class="tab-pane" style="display: none;">
-        <!-- RESUMEN DE LAS 4 UNIDADES -->
-        <div class="card">
+        <!-- VISTA 1: LOS 4 MÓDULOS / UNIDADES COMO ATAJOS -->
+        <div id="unitsOverview" class="card">
             <div class="card-title-row">
-                <h2>Programación de Unidades Académicas (Sílabo Oficial)</h2>
-                <span style="font-size: 0.8rem; color: var(--text-secondary);">4 Unidades &bull; 16 Semanas</span>
+                <div>
+                    <h2>Módulos Académicos del Curso (Sílabo Oficial)</h2>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">Haz clic en cualquier módulo para abrir su ventana con sus 4 semanas, introducción, video guía y entregables.</p>
+                </div>
+                <span style="font-size: 0.8rem; color: var(--text-secondary);">4 Módulos &bull; 16 Semanas</span>
             </div>
 
             <div class="units-grid">
                 <c:forEach var="u" items="${unidades}">
-                    <div class="unit-card" onclick="scrollToUnit(${u.numero})" title="Ir a las tareas de la Unidad ${u.numero}">
+                    <div class="unit-card" onclick="openUnitModule(${u.numero})" title="Abrir Módulo ${u.numero}">
                         <div>
-                            <span class="unit-badge">UNIDAD ${u.numero} &bull; SEMANAS ${((u.numero-1)*4)+1}-${u.numero*4}</span>
+                            <span class="unit-badge">MÓDULO ${u.numero} &bull; SEMANAS ${((u.numero-1)*4)+1}-${u.numero*4}</span>
                             <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem;">${u.nombre}</h3>
                             <p style="font-size: 0.8rem; color: var(--text-secondary);">${u.descripcion}</p>
                         </div>
@@ -180,35 +183,52 @@
                                 <span>Progreso: ${Math.round((u.semanasCompletadas / 4.0) * 100)}%</span>
                                 <span>${u.semanasCompletadas} / 4 Semanas</span>
                             </div>
-                            <div class="unit-shortcut-hint">↘ Ir a tareas de esta unidad</div>
+                            <div class="unit-shortcut-hint">↘ Abrir ventana del Módulo ${u.numero}</div>
                         </div>
                     </div>
                 </c:forEach>
             </div>
         </div>
 
-        <!-- TABLA CON SOPORTE PARA MÚLTIPLES TRABAJOS Y VISOR EN PANTALLA -->
-        <div class="card" style="padding: 0; overflow: hidden;">
-            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 style="font-size: 1.1rem; font-weight: 800;">Lista de Trabajos y Entregables por Semana</h2>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Puedes subir más de 1 trabajo por semana y verlos directamente en pantalla</p>
+        <!-- VISTA 2: VENTANA DEDICADA DEL MÓDULO SELECCIONADO (4 SEMANAS) -->
+        <div id="unitModuleView" class="card" style="padding: 0; overflow: hidden; display: none;">
+            <div class="module-nav-bar">
+                <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeUnitModule()">
+                        ← Volver a los 4 Módulos
+                    </button>
+                    <div>
+                        <h2 id="moduleViewTitle" style="font-size: 1.15rem; font-weight: 800; color: #ffffff;">Módulo 1</h2>
+                        <p id="moduleViewSubtitle" style="font-size: 0.8rem; color: var(--text-secondary);">Semanas 1 a 4</p>
+                    </div>
                 </div>
+
+                <div class="module-pills">
+                    <button type="button" class="module-pill" data-module="1" onclick="openUnitModule(1)">Módulo 1</button>
+                    <button type="button" class="module-pill" data-module="2" onclick="openUnitModule(2)">Módulo 2</button>
+                    <button type="button" class="module-pill" data-module="3" onclick="openUnitModule(3)">Módulo 3</button>
+                    <button type="button" class="module-pill" data-module="4" onclick="openUnitModule(4)">Módulo 4</button>
+                </div>
+            </div>
+
+            <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between; align-items: center;">
                 <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
-                    <input type="text" id="searchEntregables" class="form-control" placeholder="🔍 Buscar trabajo o archivo..." oninput="filterEntregables()" style="width: 230px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                    <input type="text" id="searchEntregables" class="form-control" placeholder="🔍 Buscar en este módulo..." oninput="filterEntregables()" style="width: 240px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
                     <select id="filterEstado" class="form-control" onchange="filterEntregables()" style="width: 170px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
                         <option value="all">Todas las semanas</option>
                         <option value="done">Solo disponibles</option>
                         <option value="pending">Sin entregables</option>
                     </select>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
-                        ➕ Subir Nuevo Trabajo
-                    </button>
                 </div>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
+                    ➕ Subir Nuevo Trabajo
+                </button>
             </div>
 
             <div class="weeks-stack" id="weeksStack">
                 <c:forEach var="semIndex" begin="1" end="16">
+                    <c:set var="unitNum" value="${semIndex <= 4 ? 1 : (semIndex <= 8 ? 2 : (semIndex <= 12 ? 3 : 4))}" />
+                    <c:set var="ytId" value="${RepositorioDAO.getVideoIdSemana(semIndex)}" />
                     <c:set var="tieneArchivos" value="false" />
                     <c:set var="countSemana" value="0" />
                     <c:set var="fechaSemana" value="" />
@@ -222,7 +242,7 @@
                         </c:if>
                     </c:forEach>
 
-                    <div class="week-hud-card" id="semana-${semIndex}" data-status="${tieneArchivos ? 'done' : 'pending'}">
+                    <div class="week-hud-card" id="semana-${semIndex}" data-unit="${unitNum}" data-status="${tieneArchivos ? 'done' : 'pending'}">
                         <div class="week-hud-header">
                             <div>
                                 <div class="week-hud-title">Semana ${semIndex}</div>
@@ -240,23 +260,29 @@
                                     <span>${countSemana} ${countSemana == 1 ? 'archivo' : 'archivos'}</span>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-                                <button type="button"
-                                        class="btn btn-sm btn-yt-video"
-                                        data-videoid="${RepositorioDAO.getVideoIdSemana(semIndex)}"
-                                        data-title="Semana ${semIndex} - Video Guía"
-                                        onclick="openVideoModalFromBtn(this)">
-                                    ▶️ Video YouTube
-                                </button>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
-                                    ➕ Agregar Trabajo
-                                </button>
-                            </div>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
+                                ➕ Agregar Trabajo
+                            </button>
                         </div>
 
-                        <p class="week-hud-desc" style="margin-bottom: 0.65rem; font-weight: 600; color: #f1f5f9;">${RepositorioDAO.getTemaSemana(semIndex)}</p>
-                        <div class="week-intro-box">
-                            💡 <strong>Introducción:</strong> ${RepositorioDAO.getIntroduccionSemana(semIndex)}
+                        <div class="week-top-grid">
+                            <div>
+                                <p class="week-hud-desc" style="margin-bottom: 0.65rem; font-weight: 600; color: #f1f5f9;">${RepositorioDAO.getTemaSemana(semIndex)}</p>
+                                <div class="week-intro-box" style="margin-bottom: 0;">
+                                    💡 <strong>Introducción:</strong> ${RepositorioDAO.getIntroduccionSemana(semIndex)}
+                                </div>
+                            </div>
+
+                            <!-- CUADRO CON MINIATURA DEL VIDEO DE YOUTUBE -->
+                            <div class="yt-thumb-card"
+                                 data-videoid="${ytId}"
+                                 data-title="Semana ${semIndex} - Video Guía"
+                                 onclick="openVideoModalFromBtn(this)"
+                                 title="Reproducir video relacionado de YouTube">
+                                <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="Video Semana ${semIndex}" loading="lazy">
+                                <div class="yt-play-badge">▶</div>
+                                <div class="yt-thumb-caption">🎬 Video Guía &bull; Semana ${semIndex}</div>
+                            </div>
                         </div>
 
                         <c:choose>
@@ -650,22 +676,49 @@
         }
     }
 
-    function scrollToUnit(unidadNumero) {
-        const firstWeek = (unidadNumero - 1) * 4 + 1;
+    var currentModule = 0;
+
+    const MODULE_NAMES = {
+        1: "Módulo 1: Fundamentos y Estándares de Arquitectura",
+        2: "Módulo 2: Modelado de Arquitecturas con POO y Vistas 4+1",
+        3: "Módulo 3: Comunicación, Integración y Servicios Web REST",
+        4: "Módulo 4: Frameworks Modernos y Despliegue en Cloud"
+    };
+
+    function openUnitModule(unitNum) {
+        currentModule = Number(unitNum);
+        const overview = document.getElementById("unitsOverview");
+        const moduleView = document.getElementById("unitModuleView");
+        const titleEl = document.getElementById("moduleViewTitle");
+        const subEl = document.getElementById("moduleViewSubtitle");
+
+        if (overview) overview.style.display = "none";
+        if (moduleView) moduleView.style.display = "block";
+
+        const startWeek = (currentModule - 1) * 4 + 1;
+        const endWeek = currentModule * 4;
+        if (titleEl) titleEl.textContent = MODULE_NAMES[currentModule] || ("Módulo " + currentModule);
+        if (subEl) subEl.textContent = "Semanas " + startWeek + " a " + endWeek + " • Introducción, Video Guía y Entregables";
+
+        document.querySelectorAll(".module-pill").forEach(function(pill) {
+            pill.classList.toggle("active", Number(pill.getAttribute("data-module")) === currentModule);
+        });
+
         const search = document.getElementById("searchEntregables");
         const filter = document.getElementById("filterEstado");
         if (search) search.value = "";
         if (filter) filter.value = "all";
-        filterEntregables();
 
-        const targetCard = document.getElementById("semana-" + firstWeek);
-        if (targetCard) {
-            targetCard.scrollIntoView({ behavior: "smooth", block: "start" });
-            targetCard.classList.add("week-highlight");
-            setTimeout(function() {
-                targetCard.classList.remove("week-highlight");
-            }, 1800);
-        }
+        filterEntregables();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function closeUnitModule() {
+        currentModule = 0;
+        const overview = document.getElementById("unitsOverview");
+        const moduleView = document.getElementById("unitModuleView");
+        if (moduleView) moduleView.style.display = "none";
+        if (overview) overview.style.display = "block";
     }
 
     function openVideoModalFromBtn(btn) {
@@ -717,6 +770,11 @@
         const cards = document.querySelectorAll(".week-hud-card");
 
         cards.forEach(function(card) {
+            const cardUnit = Number(card.getAttribute("data-unit"));
+            if (currentModule > 0 && cardUnit !== currentModule) {
+                card.style.display = "none";
+                return;
+            }
             const text = card.textContent.toLowerCase();
             const cardStatus = card.getAttribute("data-status");
             const matchesText = !query || text.includes(query);
@@ -730,8 +788,13 @@
         const params = new URLSearchParams(window.location.search);
         const msg = params.get("msg");
         const err = params.get("error");
+        const weekParam = Number(params.get("week") || 0);
         if (msg === "upload_success" || msg === "delete_success" || err === "upload_failed" || err === "delete_failed" || err === "no_file_selected") {
             openTab("sec-unidades");
+            if (weekParam >= 1 && weekParam <= 16) {
+                const targetUnit = Math.ceil(weekParam / 4);
+                openUnitModule(targetUnit);
+            }
         }
 
         // Halo de linterna verde siguiendo suavemente al mouse
