@@ -66,23 +66,38 @@ public class UploadServlet extends HttpServlet {
         try {
             int semana = Integer.parseInt(request.getParameter("semana"));
             String tituloTrabajo = request.getParameter("tituloTrabajo");
-            Part archivoPart = request.getPart("archivo");
 
-            if (archivoPart != null && archivoPart.getSize() > 0) {
-                String originalFilename = archivoPart.getSubmittedFileName();
-                String contentType = archivoPart.getContentType();
-
-                // Leer bytes del archivo para poder respaldarlo en PostgreSQL y/o Supabase Storage
-                byte[] fileBytes;
-                try (InputStream is = archivoPart.getInputStream()) {
-                    fileBytes = SupabaseStorageService.readAllBytes(is);
+            java.util.List<Part> archivos = new java.util.ArrayList<>();
+            for (Part part : request.getParts()) {
+                if ("archivo".equals(part.getName()) && part.getSize() > 0) {
+                    archivos.add(part);
                 }
+            }
 
-                // Intentar subir al bucket 'assignments' en Supabase Storage (retorna null si no está configurado)
-                String archivoUrl = SupabaseStorageService.uploadBytes("assignments", originalFilename, fileBytes, contentType);
+            if (!archivos.isEmpty()) {
+                boolean varios = archivos.size() > 1;
+                for (Part archivoPart : archivos) {
+                    String originalFilename = archivoPart.getSubmittedFileName();
+                    String contentType = archivoPart.getContentType();
 
-                // Guardar registro + contenido binario en PostgreSQL (y memoria como respaldo)
-                repositorioDAO.guardarEntregable(semana, tituloTrabajo, originalFilename, archivoUrl, fileBytes, contentType);
+                    String tituloIndividual = tituloTrabajo;
+                    if (varios && originalFilename != null) {
+                        String baseName = originalFilename.replaceFirst("\\.[^.]+$", "");
+                        if (tituloTrabajo != null && !tituloTrabajo.trim().isEmpty()) {
+                            tituloIndividual = tituloTrabajo.trim() + " - " + baseName;
+                        } else {
+                            tituloIndividual = baseName;
+                        }
+                    }
+
+                    byte[] fileBytes;
+                    try (InputStream is = archivoPart.getInputStream()) {
+                        fileBytes = SupabaseStorageService.readAllBytes(is);
+                    }
+
+                    String archivoUrl = SupabaseStorageService.uploadBytes("assignments", originalFilename, fileBytes, contentType);
+                    repositorioDAO.guardarEntregable(semana, tituloIndividual, originalFilename, archivoUrl, fileBytes, contentType);
+                }
                 response.sendRedirect(request.getContextPath() + "/index?msg=upload_success&week=" + semana);
             } else {
                 response.sendRedirect(request.getContextPath() + "/index?error=no_file_selected");

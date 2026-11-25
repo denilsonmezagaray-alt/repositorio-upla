@@ -17,7 +17,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261124">
+    <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
+    <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -391,12 +393,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">Adjuntar Archivo o Imagen (PDF, PNG, JPG, DOCX, ZIP):</label>
-                            <input type="file" name="archivo" class="form-control" required>
+                            <label class="form-label">Adjuntar Archivo(s) o Imagen(es) (PDF, PNG, JPG, SQL, DOCX, ZIP — puedes seleccionar varios a la vez):</label>
+                            <input type="file" name="archivo" class="form-control" multiple required>
                         </div>
 
                         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                            📤 Cargar Trabajo al Repositorio Supabase
+                            📤 Cargar Trabajo(s) al Repositorio Supabase
                         </button>
                     </form>
                 </div>
@@ -590,12 +592,22 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Archivos Entregados por Unidad',
+                        label: 'Semanas Completadas por Unidad',
                         data: dataCompletadas,
-                        backgroundColor: 'rgba(0, 82, 204, 0.85)',
-                        borderColor: '#0052cc',
-                        borderWidth: 1.5,
-                        borderRadius: 6
+                        backgroundColor: [
+                            'rgba(0, 163, 224, 0.85)',
+                            'rgba(16, 185, 129, 0.85)',
+                            'rgba(139, 92, 246, 0.85)',
+                            'rgba(245, 158, 11, 0.85)'
+                        ],
+                        borderColor: [
+                            '#00a3e0',
+                            '#10b981',
+                            '#8b5cf6',
+                            '#f59e0b'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
                     }]
                 },
                 options: {

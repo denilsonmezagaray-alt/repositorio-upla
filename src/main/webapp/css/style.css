@@ -57,9 +57,9 @@ body {
 /* Layout Container */
 .container {
     width: 100%;
-    max-width: 1240px;
+    max-width: 1720px;
     margin: 0 auto;
-    padding: 0 1.5rem 3rem 1.5rem;
+    padding: 0 2rem 3rem 2rem;
 }
 
 /* Top Header Bar */
@@ -235,12 +235,18 @@ body {
 /* 4 Units Cards Grid */
 .units-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.25rem;
     margin-bottom: 1.5rem;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1150px) {
+    .units-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
     .units-grid {
         grid-template-columns: 1fr;
     }
@@ -443,9 +449,9 @@ body {
     background: var(--bg-card);
     border: 1px solid var(--border-card);
     border-radius: var(--radius-lg);
-    width: 100%;
-    max-width: 900px;
-    max-height: 90vh;
+    width: 94%;
+    max-width: 1180px;
+    max-height: 92vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
