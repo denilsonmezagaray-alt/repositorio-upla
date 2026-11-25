@@ -19,7 +19,7 @@
     <title>Portafolio Académico | Arquitectura de Software - UPLA</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
     <link rel="apple-touch-icon" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125d">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125e">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -47,7 +47,8 @@
                 </c:when>
                 <c:otherwise>
                     <a href="${pageContext.request.contextPath}/auth" class="btn btn-primary btn-sm">
-                        🔐 Acceso Alumno (Alessander)
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Acceso Alumno (Alessander)
                     </a>
                 </c:otherwise>
             </c:choose>
@@ -57,45 +58,49 @@
     <!-- MENÚ DE NAVEGACIÓN POR PESTAÑAS (CLICK ROBUSTO) -->
     <nav class="nav-tabs">
         <button type="button" class="tab-link active" data-tab="sec-inicio" onclick="openTab('sec-inicio')">
-            🏠 Inicio & Perfil
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Inicio &amp; Perfil
         </button>
         <button type="button" class="tab-link" data-tab="sec-unidades" onclick="openTab('sec-unidades')">
-            📚 Unidades & Entregables (${entregables.size()} Trabajos)
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Unidades &amp; Entregables (${entregables.size()} Trabajos)
         </button>
         <button type="button" class="tab-link" data-tab="sec-metricas" onclick="openTab('sec-metricas')">
-            📊 Avance Curricular
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Avance Curricular
         </button>
         <button type="button" class="tab-link" data-tab="sec-admin" onclick="openTab('sec-admin')">
-            ⚙️ ${not empty sessionScope.usuario ? 'Subir Nuevo Trabajo' : 'Información del Sistema'}
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            ${not empty sessionScope.usuario ? 'Subir Nuevo Trabajo' : 'Gestión de Entregables'}
         </button>
     </nav>
 
     <!-- ALERTAS DINÁMICAS DE ESTADO -->
     <c:if test="${not empty param.msg}">
-        <div id="statusAlert" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
+        <div id="statusAlert" style="background: rgba(18, 140, 112, 0.16); border: 1px solid rgba(42, 168, 137, 0.45); color: #4ade80; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
             <span>
                 <c:choose>
-                    <c:when test="${param.msg == 'upload_success'}">✅ Trabajo guardado correctamente en el repositorio (Semana ${param.week}).</c:when>
-                    <c:when test="${param.msg == 'delete_success'}">🗑️ El entregable fue eliminado correctamente.</c:when>
-                    <c:when test="${param.msg == 'login_success'}">🔐 Sesión iniciada correctamente. Ya puedes subir o administrar trabajos.</c:when>
-                    <c:when test="${param.msg == 'logged_out'}">👋 Sesión cerrada correctamente.</c:when>
-                    <c:otherwise>✅ Operación completada correctamente.</c:otherwise>
+                    <c:when test="${param.msg == 'upload_success'}">Trabajo guardado correctamente en el repositorio (Semana ${param.week}).</c:when>
+                    <c:when test="${param.msg == 'delete_success'}">El entregable fue eliminado correctamente.</c:when>
+                    <c:when test="${param.msg == 'login_success'}">Sesión iniciada correctamente. Ya puedes subir o administrar trabajos.</c:when>
+                    <c:when test="${param.msg == 'logged_out'}">Sesión cerrada correctamente.</c:when>
+                    <c:otherwise>Operación completada correctamente.</c:otherwise>
                 </c:choose>
             </span>
-            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #34d399; cursor: pointer; font-size: 1rem;">✕</button>
+            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #4ade80; cursor: pointer; font-size: 1rem;">✕</button>
         </div>
     </c:if>
     <c:if test="${not empty param.error}">
-        <div id="errorAlert" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #f87171; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
+        <div id="errorAlert" style="background: rgba(181, 56, 53, 0.18); border: 1px solid rgba(201, 93, 104, 0.45); color: #fca5a5; padding: 0.9rem 1.25rem; border-radius: 12px; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; font-weight: 600;">
             <span>
                 <c:choose>
-                    <c:when test="${param.error == 'upload_failed'}">⚠️ No se pudo subir el archivo. Verifica el tamaño o intenta nuevamente.</c:when>
-                    <c:when test="${param.error == 'no_file_selected'}">⚠️ Debes seleccionar un archivo antes de subir.</c:when>
-                    <c:when test="${param.error == 'delete_failed'}">⚠️ No se pudo eliminar el entregable.</c:when>
-                    <c:otherwise>⚠️ Ocurrió un error al procesar la solicitud.</c:otherwise>
+                    <c:when test="${param.error == 'upload_failed'}">No se pudo subir el archivo. Verifica el tamaño o intenta nuevamente.</c:when>
+                    <c:when test="${param.error == 'no_file_selected'}">Debes seleccionar al menos un archivo antes de subir.</c:when>
+                    <c:when test="${param.error == 'delete_failed'}">No se pudo eliminar el entregable.</c:when>
+                    <c:otherwise>Ocurrió un error al procesar la solicitud.</c:otherwise>
                 </c:choose>
             </span>
-            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #f87171; cursor: pointer; font-size: 1rem;">✕</button>
+            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; color: #fca5a5; cursor: pointer; font-size: 1rem;">✕</button>
         </div>
     </c:if>
 
@@ -143,8 +148,8 @@
             </div>
 
             <div style="display: flex; align-items: center; gap: 1.25rem;">
-                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--upla-blue-600); display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: #fff;">
-                    👨‍🏫
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--upla-blue-600); display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0;">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
                 </div>
                 <div>
                     <h3 style="font-size: 1.15rem; font-weight: 800;">Mg. Raúl Enrique Fernández Bejarano</h3>
@@ -213,7 +218,7 @@
 
             <div style="padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-card); display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: space-between; align-items: center;">
                 <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center;">
-                    <input type="text" id="searchEntregables" class="form-control" placeholder="🔍 Buscar en este módulo..." oninput="filterEntregables()" style="width: 240px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
+                    <input type="text" id="searchEntregables" class="form-control" placeholder="Buscar en este módulo..." oninput="filterEntregables()" style="width: 240px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
                     <select id="filterEstado" class="form-control" onchange="filterEntregables()" style="width: 170px; padding: 0.45rem 0.75rem; font-size: 0.85rem;">
                         <option value="all">Todas las semanas</option>
                         <option value="done">Solo disponibles</option>
@@ -221,7 +226,7 @@
                     </select>
                 </div>
                 <button type="button" class="btn btn-primary btn-sm" onclick="openTab('sec-admin')">
-                    ➕ Subir Nuevo Trabajo
+                    + Subir Nuevo Trabajo
                 </button>
             </div>
 
@@ -247,7 +252,7 @@
                             <div>
                                 <div class="week-hud-title">Semana ${semIndex}</div>
                                 <div class="week-hud-meta">
-                                    <span>📅</span>
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                                     <c:choose>
                                         <c:when test="${not empty fechaSemana}">
                                             <span><fmt:formatDate value="${fechaSemana}" pattern="yyyy-MM-dd" /></span>
@@ -261,7 +266,7 @@
                                 </div>
                             </div>
                             <button type="button" class="btn btn-secondary btn-sm" onclick="openUploadForWeek(${semIndex})">
-                                ➕ Agregar Trabajo
+                                + Agregar Trabajo
                             </button>
                         </div>
 
@@ -269,7 +274,7 @@
                             <div>
                                 <p class="week-hud-desc" style="margin-bottom: 0.65rem; font-weight: 600; color: #f1f5f9;">${RepositorioDAO.getTemaSemana(semIndex)}</p>
                                 <div class="week-intro-box" style="margin-bottom: 0;">
-                                    💡 <strong>Introducción:</strong> ${RepositorioDAO.getIntroduccionSemana(semIndex)}
+                                    <strong>Introducción:</strong> ${RepositorioDAO.getIntroduccionSemana(semIndex)}
                                 </div>
                             </div>
 
@@ -281,14 +286,14 @@
                                  title="Reproducir video relacionado de YouTube">
                                 <img src="https://img.youtube.com/vi/${ytId}/hqdefault.jpg" alt="Video Semana ${semIndex}" loading="lazy">
                                 <div class="yt-play-badge">▶</div>
-                                <div class="yt-thumb-caption">🎬 Video Guía &bull; Semana ${semIndex}</div>
+                                <div class="yt-thumb-caption">Video Guía &bull; Semana ${semIndex}</div>
                             </div>
                         </div>
 
                         <c:choose>
                             <c:when test="${tieneArchivos}">
                                 <div class="attachments-label">
-                                    <span>📎</span>
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
                                     <span>ARCHIVOS ADJUNTOS</span>
                                 </div>
 
@@ -337,13 +342,15 @@
                                                             data-title="${fn:escapeXml(e.tituloTrabajo)}"
                                                             data-filename="${fn:escapeXml(e.nombreArchivo)}"
                                                             onclick="openDocViewerFromBtn(this)">
-                                                        👁️ VER
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                                        VER
                                                     </button>
                                                     <a href="${fn:escapeXml(downloadUrl)}"
                                                        target="_blank"
                                                        class="btn-hud btn-hud-download"
                                                        download="${fn:escapeXml(e.nombreArchivo)}">
-                                                        ⬇️ DESCARGAR
+                                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                                        DESCARGAR
                                                     </a>
                                                 </div>
 
@@ -351,8 +358,8 @@
                                                 <c:if test="${e.semana == 8 || fn:contains(fn:toLowerCase(e.tituloTrabajo), 'figma') || not empty sessionScope.usuario}">
                                                     <div class="attachment-extra-actions">
                                                         <c:if test="${e.semana == 8 || fn:contains(fn:toLowerCase(e.tituloTrabajo), 'figma')}">
-                                                            <a href="https://www.figma.com/design/kpkKx5iSVkcJjIFDCHov37/Sin-t%C3%ADtulo?node-id=2-3&t=NW402MHREiENVPpl-0" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="flex:1; justify-content:center; background: linear-gradient(135deg, #a259ff, #f24e1e); color: #fff; font-weight: 700; border: none; text-decoration: none;">
-                                                                🎨 Prototipo Figma
+                                                            <a href="https://www.figma.com/design/kpkKx5iSVkcJjIFDCHov37/Sin-t%C3%ADtulo?node-id=2-3&t=NW402MHREiENVPpl-0" target="_blank" rel="noopener noreferrer" class="btn btn-sm" style="flex:1; justify-content:center; background: linear-gradient(135deg, #d2691e, #a1497d); color: #fff; font-weight: 700; border: none; text-decoration: none;">
+                                                                Prototipo Figma
                                                             </a>
                                                         </c:if>
                                                         <c:if test="${not empty sessionScope.usuario}">
@@ -360,7 +367,7 @@
                                                                 <input type="hidden" name="action" value="delete">
                                                                 <input type="hidden" name="id" value="${e.id}">
                                                                 <button type="submit" class="btn btn-danger btn-sm" title="Eliminar trabajo">
-                                                                    🗑️
+                                                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                                                 </button>
                                                             </form>
                                                         </c:if>
@@ -373,9 +380,9 @@
                             </c:when>
                             <c:otherwise>
                                 <div class="week-empty-box">
-                                    <span class="status-pill status-wait">⌛ Sin entregables aún para esta semana</span>
+                                    <span class="status-pill status-wait">Sin entregables registrados para esta semana</span>
                                     <button type="button" class="btn btn-primary btn-sm" onclick="openUploadForWeek(${semIndex})">
-                                        ➕ Subir Entregable
+                                        + Subir Entregable
                                     </button>
                                 </div>
                             </c:otherwise>
@@ -438,7 +445,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                            📤 Cargar Trabajo(s) al Repositorio Supabase
+                            Cargar Trabajo(s) al Repositorio Supabase
                         </button>
                     </form>
                 </div>
@@ -451,7 +458,7 @@
                         Debes iniciar sesión como alumno administrador para subir nuevos archivos, asignar nombres a tus trabajos o eliminar entregables.
                     </p>
                     <a href="${pageContext.request.contextPath}/auth" class="btn btn-primary">
-                        🔐 Iniciar Sesión como Alessander Meza Garay
+                        Iniciar Sesión como Alessander Meza Garay
                     </a>
                 </div>
             </c:otherwise>
@@ -465,9 +472,9 @@
                 <h3 id="modalDocTitle" style="font-size: 1rem; color: #ffffff; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 65%;">Visor de Documentos UPLA</h3>
                 <div style="display: flex; gap: 0.5rem; align-items: center;">
                     <a id="modalOpenNewTab" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="text-decoration: none;">
-                        ↗️ Abrir en Pestaña
+                        Abrir en Pestaña
                     </a>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">✕ Cerrar Visor</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeDocViewer()">Cerrar Visor</button>
                 </div>
             </div>
             <div class="modal-body" id="modalDocContainer">
@@ -480,14 +487,16 @@
     <footer class="footer">
         <p><strong>UNIVERSIDAD PERUANA LOS ANDES &bull; FACULTAD DE INGENIERÍA</strong></p>
         <p>Portafolio Digital de Arquitectura de Software 2026-I &bull; Desarrollado por <strong>Alessander Meza Garay</strong> (Código: r03396b &bull; Correo: r03396b@ms.upla.edu.pe)</p>
-        <p style="margin-top: 0.5rem; font-size: 0.78rem;">
+        <p style="margin-top: 0.5rem; font-size: 0.78rem; display: flex; align-items: center; justify-content: center; gap: 0.45rem;">
             <c:set var="dbErr" value="${RepositorioDAO.getUltimoErrorBD()}" />
             <c:choose>
                 <c:when test="${empty dbErr}">
-                    <span style="color: #34d399;">🟢 Conectado a Supabase PostgreSQL (Persistencia activa)</span>
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#34d399;"></span>
+                    <span style="color: #34d399;">Conectado a Supabase PostgreSQL (Persistencia activa)</span>
                 </c:when>
                 <c:otherwise>
-                    <span style="color: #f87171;">🔴 Modo Memoria Temporal (Sin conexión a Supabase: ${fn:escapeXml(dbErr)})</span>
+                    <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#f87171;"></span>
+                    <span style="color: #f87171;">Modo Memoria Temporal (Sin conexión a Supabase: ${fn:escapeXml(dbErr)})</span>
                 </c:otherwise>
             </c:choose>
         </p>
@@ -551,7 +560,7 @@
         const openNewTabLink = document.getElementById("modalOpenNewTab");
         const container = document.getElementById("modalDocContainer");
 
-        modalTitle.textContent = "📖 Viendo: " + title;
+        modalTitle.textContent = "Viendo: " + title;
         if (openNewTabLink) {
             openNewTabLink.href = url;
         }
@@ -736,7 +745,7 @@
         const watchUrl = "https://www.youtube.com/watch?v=" + videoId;
         const embedUrl = "https://www.youtube.com/embed/" + videoId + "?autoplay=1&rel=0";
 
-        modalTitle.textContent = "🎬 " + title;
+        modalTitle.textContent = title;
         if (openNewTabLink) {
             openNewTabLink.href = watchUrl;
         }

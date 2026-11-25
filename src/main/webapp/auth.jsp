@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Alumno Administrador | UPLA Arquitectura de Software</title>
     <link rel="icon" type="image/png" href="${pageContext.request.contextPath}/img/upla_logo.png">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125b">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css?v=20261125e">
     <style>
         .auth-wrapper {
             max-width: 460px;
@@ -96,7 +96,7 @@
                         <input type="password" name="clave" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
-                        🔐 Ingresar como Administrador
+                        Ingresar como Administrador
                     </button>
                 </form>
             </div>
@@ -122,7 +122,7 @@
                         <input type="file" name="fotoPerfil" class="form-control" accept="image/*">
                     </div>
                     <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
-                        📸 Crear Cuenta y Guardar Foto en Supabase
+                        Crear Cuenta y Guardar en Supabase
                     </button>
                 </form>
             </div>
